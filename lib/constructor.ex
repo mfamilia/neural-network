@@ -110,8 +110,7 @@ defmodule NN.Constructor do
   end
 
   def generate_id do
-    {mega_seconds, seconds, micro_seconds} = :os.timestamp
-    1/(mega_seconds*1000000+seconds+micro_seconds/1000000)
+    UUID.uuid4()
   end
 
   def create_cortex(cortex_id, sensor_ids, actuator_ids, neuron_ids) do
