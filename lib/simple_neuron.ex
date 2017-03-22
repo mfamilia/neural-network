@@ -1,16 +1,28 @@
 defmodule NN.SimpleNeuron do
   use GenServer
 
-  def start_link(default) do
-    GenServer.start_link(__MODULE__, default)
+  def start_link do
+    GenServer.start_link(__MODULE__, nil)
   end
 
-  def init(state \\ [
-    :rand.uniform-0.5,
-    :rand.uniform-0.5,
-    :rand.uniform-0.5]) do
+  def start_link(weights) do
+    GenServer.start_link(__MODULE__, weights)
+  end
 
-    {:ok, state}
+  def init(weights)
+    when is_nil(weights) do
+
+    default_weights= [
+      :rand.uniform-0.5,
+      :rand.uniform-0.5,
+      :rand.uniform-0.5
+    ]
+
+    {:ok, default_weights}
+  end
+
+  def init(weights) do
+    {:ok, weights}
   end
 
   def weights(pid) do

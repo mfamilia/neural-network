@@ -24,4 +24,14 @@ defmodule NN.SimpleNeuronTest do
 
     assert ^result = [0.9640275800758169]
   end
+
+  test "random weights" do
+    {:ok, pid} = NN.SimpleNeuron.start_link
+
+    NN.SimpleNeuron.weights(pid)
+      |> Enum.each(fn(x) ->
+        assert x >= -0.5
+        assert x <= 0.5
+      end)
+  end
 end
