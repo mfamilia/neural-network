@@ -1,8 +1,8 @@
 defmodule NN.SimpleNN do
   def create do
-    weights = [:random.uniform-0.5,
-               :random.uniform-0.5,
-               :random.uniform-0.5]
+    weights = [:rand.uniform-0.5,
+               :rand.uniform-0.5,
+               :rand.uniform-0.5]
 
     neuron_pid = spawn __MODULE__, :neuron, [weights, nil, nil]
     sensor_pid = spawn __MODULE__, :sensor, [neuron_pid]
@@ -33,7 +33,7 @@ defmodule NN.SimpleNN do
   def sensor(neuron_pid) do
     receive do
       :sync ->
-        sensory_signal = [:random.uniform, :random.uniform]
+        sensory_signal = [:rand.uniform, :rand.uniform]
         :io.format("**** Sensing ****:~n Signal from the environment ~p~n", [sensory_signal])
 
         send neuron_pid, {self(), :forward, sensory_signal}

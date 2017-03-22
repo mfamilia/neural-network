@@ -88,7 +88,7 @@ defmodule NN.Constructor do
   end
 
   def create_neural_input([], acc) do
-    Enum.reverse([{:bias, :random.uniform - 0.5}|acc])
+    Enum.reverse([{:bias, :rand.uniform - 0.5}|acc])
   end
 
   def create_neural_weights(0, acc) do
@@ -96,7 +96,7 @@ defmodule NN.Constructor do
   end
 
   def create_neural_weights(index, acc) do
-    w = :random.uniform - 0.5
+    w = :rand.uniform - 0.5
     create_neural_weights(index-1, [w|acc])
   end
 
