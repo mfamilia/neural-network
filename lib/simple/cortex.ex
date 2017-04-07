@@ -1,5 +1,6 @@
 defmodule NN.Simple.Cortex do
   use GenServer
+  alias NN.Simple.{Actuator, Neuron, Sensor}
 
   defmodule State do
     defstruct sensor: nil,
@@ -13,9 +14,9 @@ defmodule NN.Simple.Cortex do
   end
 
   def init(%{env: env} = state) do
-    {:ok, actuator} = NN.Simple.Actuator.start_link(self(), env)
-    {:ok, neuron} = NN.Simple.Neuron.start_link(actuator)
-    {:ok, sensor} = NN.Simple.Sensor.start_link(neuron, env)
+    {:ok, actuator} = Actuator.start_link(self(), env)
+    {:ok, neuron} = Neuron.start_link(actuator)
+    {:ok, sensor} = Sensor.start_link(neuron, env)
 
     {:ok, %{state | actuator: actuator, neuron: neuron, sensor: sensor}}
   end
@@ -40,7 +41,7 @@ defmodule NN.Simple.Cortex do
   end
 
   def handle_cast(:sense_think_act, %{sensor: sensor} = state) do
-    NN.Simple.Sensor.sync(sensor)
+    Sensor.sync(sensor)
 
     {:noreply, state}
   end
