@@ -1,9 +1,12 @@
 defmodule NN.SimpleNeuronTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
+
+  import Mock
 
   setup do
-    weights = [0.5, 0.5, 0.5]
-    {:ok, pid} = NN.SimpleNeuron.start_link(weights)
+    target = self()
+
+    {:ok, pid} = NN.SimpleNeuron.start_link(target)
 
     [neuron: pid]
   end
@@ -12,23 +15,24 @@ defmodule NN.SimpleNeuronTest do
     assert Process.alive?(neuron)
   end
 
-  test "get weights", %{neuron: neuron} do
-    weights = NN.SimpleNeuron.weights(neuron)
+  test "sense output" do
+    with_mock Random, [uniform: fn -> 1 end] do
+      {:ok, neuron} = NN.SimpleNeuron.start_link(self())
 
-    assert ^weights = [0.5, 0.5, 0.5]
+      NN.SimpleNeuron.weights(neuron)
+        |> Enum.each(fn(x) ->
+          assert ^x = 0.5
+        end)
+
+      signal = [1, 2]
+      NN.SimpleNeuron.sense(neuron, signal)
+
+      assert_receive {:"$gen_cast", {:forward, [0.9640275800758169]}}
+    end
   end
 
-  test "process sense", %{neuron: neuron} do
-    signal = [1, 2]
-    result = NN.SimpleNeuron.sense(neuron, signal)
-
-    assert ^result = [0.9640275800758169]
-  end
-
-  test "random weights" do
-    {:ok, pid} = NN.SimpleNeuron.start_link
-
-    NN.SimpleNeuron.weights(pid)
+  test "random weights", %{neuron: neuron} do
+    NN.SimpleNeuron.weights(neuron)
       |> Enum.each(fn(x) ->
         assert x >= -0.5
         assert x <= 0.5

@@ -1,3 +1,4 @@
 %{"espec": {:hex, :espec, "1.2.2", "c54cead6b197e9bcf32406d43eaedb1675a2b35c5ccc63f1033782c8d616b4a2", [:mix], [{:meck, "~> 0.8.4", [hex: :meck, optional: false]}]},
   "meck": {:hex, :meck, "0.8.4", "59ca1cd971372aa223138efcf9b29475bde299e1953046a0c727184790ab1520", [:make, :rebar], []},
+  "mock": {:hex, :mock, "0.2.1", "bfdba786903e77f9c18772dee472d020ceb8ef000783e737725a4c8f54ad28ec", [:mix], [{:meck, "~> 0.8.2", [hex: :meck, optional: false]}]},
   "uuid": {:hex, :uuid, "1.1.7", "007afd58273bc0bc7f849c3bdc763e2f8124e83b957e515368c498b641f7ab69", [:mix], []}}

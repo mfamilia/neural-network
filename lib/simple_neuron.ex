@@ -1,49 +1,44 @@
 defmodule NN.SimpleNeuron do
   use GenServer
 
-  def start_link do
-    GenServer.start_link(__MODULE__, nil)
+  def start_link(target) do
+    GenServer.start_link(__MODULE__, target)
   end
 
-  def start_link(weights) do
-    GenServer.start_link(__MODULE__, weights)
-  end
-
-  def init(weights)
-    when is_nil(weights) do
-
-    default_weights= [
-      :rand.uniform-0.5,
-      :rand.uniform-0.5,
-      :rand.uniform-0.5
+  def init(target) do
+    default_weights = [
+      random(),
+      random(),
+      random()
     ]
 
-    {:ok, default_weights}
-  end
-
-  def init(weights) do
-    {:ok, weights}
+    {:ok, {target, default_weights}}
   end
 
   def weights(pid) do
     GenServer.call(pid, :weights)
   end
 
-  def sense(pid, signal) do
-    GenServer.call(pid, {:sense, signal})
+  def sense(pid, input) do
+    GenServer.cast(pid, {:forward, input})
   end
 
-  def handle_call(:weights, _from, weights) do
-    {:reply, weights, weights}
+  def handle_call(:weights, _from, {_, weights} = state) do
+    {:reply, weights, state}
   end
 
-  def handle_call({:sense, signal}, _from, weights)
-    when is_list(signal) and (length(signal) == 2) do
+  def handle_cast({:forward, input}, {target, weights} = state)
+    when is_list(input) and (length(input) == 2) do
 
-    dot_product = dot(signal, weights, 0)
+    dot_product = dot(input, weights, 0)
     output = [:math.tanh(dot_product)]
+    GenServer.cast(target, {:forward, output})
 
-    {:reply, output, weights}
+    {:noreply, state}
+  end
+
+  defp random do
+    Random.uniform-0.5
   end
 
   defp dot([i|input], [w|weights], acc) do

@@ -22,7 +22,8 @@ defmodule NN.Mixfile do
 
   defp deps do
     [
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:mock, "~> 0.2.0", only: :test}
     ]
   end
 end
