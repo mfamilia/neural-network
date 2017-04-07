@@ -1,4 +1,4 @@
-defmodule NN.SimpleNN do
+defmodule NN.Simple.NN do
   def create do
     weights = [:rand.uniform-0.5,
                :rand.uniform-0.5,

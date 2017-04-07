@@ -1,10 +1,10 @@
-defmodule NN.SimpleActuatorTest do
+defmodule NN.Simple.ActuatorTest do
   use ExUnit.Case
 
   setup do
     cortex = env = self()
 
-    {:ok, pid} = NN.SimpleActuator.start_link(cortex, env)
+    {:ok, pid} = NN.Simple.Actuator.start_link(cortex, env)
 
     [actuator: pid]
   end

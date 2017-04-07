@@ -1,4 +1,4 @@
-defmodule NN.SimpleNeuron do
+defmodule NN.Simple.Neuron do
   use GenServer
 
   def start_link(target) do
