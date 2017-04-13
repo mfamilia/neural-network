@@ -25,14 +25,10 @@ defmodule NN.Constructors.NeuronTest do
       input_layer: input_layer,
       neurons: neurons,
       output_layer: output_layer,
-      layer_densities: layer_densities,
-      cortex_id: cortex_id,
-      sensor: sensor,
-      actuator: actuator
     ]
   end
 
-  test "input layer neurons", %{layer_densities: l, sensor: s, input_layer: i} do
+  test "input layer neurons", %{input_layer: i} do
     assert [{:neuron, id, cortex, af, inputs, outputs}] = i
     assert is_function(af, 1)
     expected_af = &:math.tanh/1
@@ -51,7 +47,14 @@ defmodule NN.Constructors.NeuronTest do
     end)
   end
 
-  test "output layer neurons", %{layer_densities: l, sensor: s, output_layer: o} do
+  test "neurons layers", %{neurons: neurons} do
+    assert [layer1, layer2, layer3] = neurons
+    assert length(layer1) == 1
+    assert length(layer2) == 3
+    assert length(layer3) == 1
+  end
+
+  test "output layer neurons", %{output_layer: o} do
     assert [{:neuron, id, cortex, af, inputs, outputs}] = o
     expected_af = &:math.tanh/1
     assert expected_af == af

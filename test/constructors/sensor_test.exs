@@ -1,5 +1,4 @@
 defmodule NN.Constructors.SensorTest do
-  import NN.NetworkElementTypes
   alias NN.Constructors.Sensor
   require Record
 

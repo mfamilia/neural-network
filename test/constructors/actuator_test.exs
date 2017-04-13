@@ -1,5 +1,4 @@
 defmodule NN.Constructors.ActuatorTest do
-  import NN.NetworkElementTypes
   alias NN.Constructors.Actuator
   require Record
 

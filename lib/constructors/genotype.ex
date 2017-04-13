@@ -66,7 +66,7 @@ defmodule NN.Constructors.Genotype do
     sensor = sensor(s, cortex_id: cortex_id, fanned_out_ids: first_layer_neuron_ids)
     actuator = actuator(a, cortex_id: cortex_id, fanned_in_ids: last_layer_neuron_ids)
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
-    genotype = {cortex, sensor, actuator, neurons}
+    genotype = List.flatten([cortex, sensor, actuator | neurons])
 
     GenServer.cast(handler, {:genotype, genotype})
   end

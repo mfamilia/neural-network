@@ -1,5 +1,4 @@
 defmodule NN.Constructors.CortexTest do
-  import NN.NetworkElementTypes
   alias NN.Constructors.Cortex
   require Record
 
