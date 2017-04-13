@@ -32,9 +32,8 @@ defmodule NN.V2.Cortex do
   end
 
   def handle_cast({actuator, :sync}, %{actuators: [actuator], total_steps: 0} = state) do
-    Process.exit(self(), :normal)
 
-    {:noreply, state}
+    {:stop, :normal, state}
   end
 
   def handle_cast({actuator, :sync}, %{actuators: [actuator]} = state) do
