@@ -44,18 +44,20 @@ defmodule NN.V2.CortexTest do
     Process.flag :trap_exit, true
     id = :id
     {:ok, sensor} = Sensor.start_link
-    {:ok, actuator} = Actuator.start_link
+    {:ok, actuator1} = Actuator.start_link
+    {:ok, actuator2} = Actuator.start_link
     {:ok, neuron} = Neuron.start_link
     total_steps = 3
 
-    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator], [neuron]}, total_steps})
+    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator1, actuator2], [neuron]}, total_steps})
 
     for _ <- 1..3 do
-      GenServer.cast(sut, {actuator, :sync})
+      GenServer.cast(sut, {actuator2, :sync})
+      GenServer.cast(sut, {actuator1, :sync})
     end
 
     assert_receive {:EXIT, ^sensor, :normal}
-    assert_receive {:EXIT, ^actuator, :normal}
+    assert_receive {:EXIT, ^actuator1, :normal}
     assert_receive {:EXIT, ^neuron, :normal}
     assert_receive {:EXIT, ^sut, :normal}
   end
