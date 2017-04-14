@@ -32,7 +32,6 @@ defmodule NN.V2.Cortex do
   end
 
   def handle_cast({actuator, :sync}, %{actuators: [actuator], total_steps: 0} = state) do
-
     {:stop, :normal, state}
   end
 
@@ -58,8 +57,11 @@ defmodule NN.V2.Cortex do
     {:noreply, state}
   end
 
-  def terminate(_reason, _state) do
-    IO.puts "terminating"
+  def terminate(_reason, %{sensors: sensors, memory: actuators, neurons: neurons}) do
+    [sensors, actuators, neurons]
+      |> Enum.each(fn(x) ->
+        Enum.each(x, &GenServer.stop/1)
+      end)
   end
 
   defp trigger_sensors(sensors) do
