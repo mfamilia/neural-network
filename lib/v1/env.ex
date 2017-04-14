@@ -1,4 +1,4 @@
-defmodule NN.Simple.Env do
+defmodule NN.V1.Env do
   use GenServer
 
   def start_link do

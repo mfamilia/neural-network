@@ -1,6 +1,6 @@
-defmodule NN.Simple.Cortex do
+defmodule NN.V1.Cortex do
   use GenServer
-  alias NN.Simple.{Actuator, Neuron, Sensor}
+  alias NN.V1.{Actuator, Neuron, Sensor}
 
   defmodule State do
     defstruct sensor: nil,

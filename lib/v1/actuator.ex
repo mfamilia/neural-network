@@ -1,4 +1,4 @@
-defmodule NN.Simple.Actuator do
+defmodule NN.V1.Actuator do
   use GenServer
 
   defmodule State do

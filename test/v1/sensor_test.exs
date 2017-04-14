@@ -1,10 +1,10 @@
-defmodule NN.Simple.SensorTest do
+defmodule NN.V1.SensorTest do
   use ExUnit.Case
 
   setup do
     neuron = env = self()
 
-    {:ok, pid} = NN.Simple.Sensor.start_link(neuron, env)
+    {:ok, pid} = NN.V1.Sensor.start_link(neuron, env)
 
     [sensor: pid]
   end
@@ -14,7 +14,7 @@ defmodule NN.Simple.SensorTest do
   end
 
   test "receive signal", %{sensor: sensor} do
-    NN.Simple.Sensor.sync(sensor)
+    NN.V1.Sensor.sync(sensor)
 
     assert_receive {:"$gen_call", from, :sense}
 

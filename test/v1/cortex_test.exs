@@ -1,10 +1,10 @@
-defmodule NN.Simple.CortexTest do
+defmodule NN.V1.CortexTest do
   use ExUnit.Case
 
   setup do
     env = self()
 
-    {:ok, pid} = NN.Simple.Cortex.start_link(env)
+    {:ok, pid} = NN.V1.Cortex.start_link(env)
 
     [cortex: pid]
   end
@@ -14,7 +14,7 @@ defmodule NN.Simple.CortexTest do
   end
 
   test "receive messages", %{cortex: cortex} do
-    NN.Simple.Cortex.sense_think_act(cortex)
+    NN.V1.Cortex.sense_think_act(cortex)
 
     assert_receive {:"$gen_call", from, :sense}
 
@@ -26,7 +26,7 @@ defmodule NN.Simple.CortexTest do
   end
 
   test "stops cortex", %{cortex: cortex} do
-    NN.Simple.Cortex.stop(cortex)
+    NN.V1.Cortex.stop(cortex)
 
     refute Process.alive?(cortex)
   end

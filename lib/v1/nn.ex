@@ -1,6 +1,6 @@
-defmodule NN.Simple.NN do
+defmodule NN.V1.NN do
   use GenServer
-  alias NN.Simple.{Cortex, Env}
+  alias NN.V1.{Cortex, Env}
 
   defmodule State do
     defstruct cortex: nil,

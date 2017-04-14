@@ -1,4 +1,4 @@
-defmodule NN.Simple.Sensor do
+defmodule NN.V1.Sensor do
   use GenServer
 
   defmodule State do
