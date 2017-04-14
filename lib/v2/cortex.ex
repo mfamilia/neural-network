@@ -7,7 +7,7 @@ defmodule NN.V2.Cortex do
       sensors: nil,
       actuators: nil,
       neurons: nil,
-      total_steps: nil,
+      cycles: nil,
       memory: nil
 
   end
@@ -15,7 +15,7 @@ defmodule NN.V2.Cortex do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
-  def handle_cast({exo_self, {id, sensors, actuators, neurons}, total_steps}, exo_self) do
+  def handle_cast({exo_self, {id, sensors, actuators, neurons}, cycles}, exo_self) do
     trigger_sensors(sensors)
 
     state = %State{
@@ -24,23 +24,23 @@ defmodule NN.V2.Cortex do
       sensors: sensors,
       actuators: actuators,
       neurons: neurons,
-      total_steps: total_steps - 1,
+      cycles: cycles - 1,
       memory: actuators
     }
 
     {:noreply, state}
   end
 
-  def handle_cast({actuator, :sync}, %{actuators: [actuator], total_steps: 0} = state) do
+  def handle_cast({actuator, :sync}, %{actuators: [actuator], cycles: 0} = state) do
     {:stop, :normal, state}
   end
 
   def handle_cast({actuator, :sync}, %{actuators: [actuator]} = state) do
-    %{sensors: sensors, memory: memory, total_steps: total_steps} = state
+    %{sensors: sensors, memory: memory, cycles: cycles} = state
 
     trigger_sensors(sensors)
 
-    state = %{state | actuators: memory, total_steps: total_steps - 1}
+    state = %{state | actuators: memory, cycles: cycles - 1}
 
     {:noreply, state}
   end

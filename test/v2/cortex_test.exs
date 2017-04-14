@@ -18,9 +18,9 @@ defmodule NN.V2.CortexTest do
     sensors = [exo_self]
     actuators = [exo_self]
     neurons = []
-    total_steps = 10
+    cycles = 10
 
-    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, total_steps})
+    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, cycles})
 
     assert_receive {:"$gen_cast", {^sut, :sync}}
   end
@@ -29,10 +29,10 @@ defmodule NN.V2.CortexTest do
     id = :id
     sensors = [exo_self]
     actuators = [exo_self]
-    total_steps = 10
+    cycles = 10
     neurons = []
 
-    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, total_steps})
+    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, cycles})
 
     GenServer.cast(sut, {exo_self, :sync})
 
@@ -40,16 +40,16 @@ defmodule NN.V2.CortexTest do
     assert_receive {:"$gen_cast", {^sut, :sync}}
   end
 
-  test "terminates after steps", %{sut: sut, exo_self: exo_self} do
+  test "terminates after cycles", %{sut: sut, exo_self: exo_self} do
     Process.flag :trap_exit, true
     id = :id
     {:ok, sensor} = Sensor.start_link
     {:ok, actuator1} = Actuator.start_link
     {:ok, actuator2} = Actuator.start_link
     {:ok, neuron} = Neuron.start_link
-    total_steps = 3
+    cycles = 3
 
-    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator1, actuator2], [neuron]}, total_steps})
+    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator1, actuator2], [neuron]}, cycles})
 
     for _ <- 1..3 do
       GenServer.cast(sut, {actuator2, :sync})
