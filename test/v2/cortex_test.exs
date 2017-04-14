@@ -61,4 +61,21 @@ defmodule NN.V2.CortexTest do
     assert_receive {:EXIT, ^neuron, :normal}
     assert_receive {:EXIT, ^sut, :normal}
   end
+
+  test "backup neurons", %{sut: sut, exo_self: exo_self} do
+    Process.flag :trap_exit, true
+    id = :id
+    {:ok, sensor} = Sensor.start_link
+    {:ok, actuator} = Actuator.start_link
+    {:ok, neuron} = Neuron.start_link
+    cycles = 3
+
+    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator], [neuron]}, cycles})
+
+    for _ <- 1..3 do
+      GenServer.cast(sut, {actuator, :sync})
+    end
+
+    assert_receive {:"$gen_cast", {^sut, :backup, [{_uuid, []}]}}
+  end
 end

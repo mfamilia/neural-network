@@ -1,5 +1,6 @@
 defmodule NN.V2.Cortex do
   use GenServer
+  alias NN.V2.{Sensor, Neuron}
 
   defmodule State do
     defstruct exo_self: nil,
@@ -9,8 +10,8 @@ defmodule NN.V2.Cortex do
       neurons: nil,
       cycles: nil,
       memory: nil
-
   end
+
   def start_link(exo_self) do
     GenServer.start_link(__MODULE__, exo_self)
   end
@@ -32,6 +33,8 @@ defmodule NN.V2.Cortex do
   end
 
   def handle_cast({actuator, :sync}, %{actuators: [actuator], cycles: 0} = state) do
+    send_backup(state)
+
     {:stop, :normal, state}
   end
 
@@ -64,9 +67,23 @@ defmodule NN.V2.Cortex do
       end)
   end
 
+  defp send_backup(%{exo_self: exo_self} = state) do
+    neuron_data = neuron_data(state)
+    GenServer.cast(exo_self, {self(), :backup, neuron_data})
+  end
+
+  defp neuron_data(%{neurons: neurons}) do
+    neurons
+      |> Enum.map(fn(n) ->
+        {n, id, weights} = Neuron.backup(n)
+
+        {id, weights}
+      end)
+  end
+
   defp trigger_sensors(sensors) do
     Enum.each(sensors, fn(s) ->
-      GenServer.cast(s, {self(), :sync})
+      Sensor.sync(s, self())
     end)
   end
 end
