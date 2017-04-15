@@ -20,8 +20,8 @@ defmodule NN.V2.Cortex do
     GenServer.cast(pid, {exo_self, {id, sensors, actuators, neurons}, cycles})
   end
 
-  def actuator_sync(pid, actuator) do
-    GenServer.cast(pid, {actuator, :sync})
+  def sync(pid, from) do
+    GenServer.cast(pid, {from, :sync})
   end
 
   def handle_cast({exo_self, {id, sensors, actuators, neurons}, cycles}, exo_self) do
