@@ -46,15 +46,15 @@ defmodule NN.V2.Sensor do
     {:noreply, state}
   end
 
-  defp sensory_vector(%{vector_length: vl}) do
-    sensory_vector(vl, [])
+  defp sensory_vector(%{vector_length: vl, sensor_type: type}) do
+    apply(__MODULE__, type, [vl, []])
   end
 
-  defp sensory_vector(0, acc) do
+  def random(0, acc) do
     acc
   end
 
-  defp sensory_vector(vl, acc) do
-    sensory_vector(vl - 1, [Random.uniform | acc])
+  def random(vl, acc) do
+    random(vl - 1, [Random.uniform | acc])
   end
 end
