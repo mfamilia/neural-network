@@ -16,6 +16,14 @@ defmodule NN.V2.Cortex do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
+  def initialize(pid, exo_self, id, sensors, actuators, neurons, cycles) do
+    GenServer.cast(pid, {exo_self, {id, sensors, actuators, neurons}, cycles})
+  end
+
+  def actuator_sync(pid, actuator) do
+    GenServer.cast(pid, {actuator, :sync})
+  end
+
   def handle_cast({exo_self, {id, sensors, actuators, neurons}, cycles}, exo_self) do
     trigger_sensors(sensors)
 
@@ -75,7 +83,7 @@ defmodule NN.V2.Cortex do
   defp neuron_data(%{neurons: neurons}) do
     neurons
       |> Enum.map(fn(n) ->
-        {n, id, weights} = Neuron.backup(n)
+        {^n, id, weights} = Neuron.backup(n)
 
         {id, weights}
       end)

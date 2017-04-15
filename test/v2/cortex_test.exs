@@ -20,7 +20,7 @@ defmodule NN.V2.CortexTest do
     neurons = []
     cycles = 10
 
-    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, cycles})
+    Cortex.initialize(sut, exo_self, id, sensors, actuators, neurons, cycles)
 
     assert_receive {:"$gen_cast", {^sut, :sync}}
   end
@@ -32,28 +32,28 @@ defmodule NN.V2.CortexTest do
     cycles = 10
     neurons = []
 
-    GenServer.cast(sut, {exo_self, {id, sensors, actuators, neurons}, cycles})
-
-    GenServer.cast(sut, {exo_self, :sync})
-
+    Cortex.initialize(sut, exo_self, id, sensors, actuators, neurons, cycles)
     assert_receive {:"$gen_cast", {^sut, :sync}}
+
+    Cortex.actuator_sync(sut, exo_self)
     assert_receive {:"$gen_cast", {^sut, :sync}}
   end
 
   test "terminates after cycles", %{sut: sut, exo_self: exo_self} do
     Process.flag :trap_exit, true
     id = :id
-    {:ok, sensor} = Sensor.start_link
+    {:ok, sensor} = Sensor.start_link(exo_self)
+    Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator1} = Actuator.start_link
     {:ok, actuator2} = Actuator.start_link
     {:ok, neuron} = Neuron.start_link
     cycles = 3
 
-    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator1, actuator2], [neuron]}, cycles})
+    Cortex.initialize(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron], cycles)
 
     for _ <- 1..3 do
-      GenServer.cast(sut, {actuator2, :sync})
-      GenServer.cast(sut, {actuator1, :sync})
+      Cortex.actuator_sync(sut, actuator2)
+      Cortex.actuator_sync(sut, actuator1)
     end
 
     assert_receive {:EXIT, ^sensor, :normal}
@@ -65,15 +65,16 @@ defmodule NN.V2.CortexTest do
   test "backup neurons", %{sut: sut, exo_self: exo_self} do
     Process.flag :trap_exit, true
     id = :id
-    {:ok, sensor} = Sensor.start_link
+    {:ok, sensor} = Sensor.start_link(exo_self)
+    Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator} = Actuator.start_link
     {:ok, neuron} = Neuron.start_link
     cycles = 3
 
-    GenServer.cast(sut, {exo_self, {id, [sensor], [actuator], [neuron]}, cycles})
+    Cortex.initialize(sut, exo_self, id, [sensor], [actuator], [neuron], cycles)
 
     for _ <- 1..3 do
-      GenServer.cast(sut, {actuator, :sync})
+      Cortex.actuator_sync(sut, actuator)
     end
 
     assert_receive {:"$gen_cast", {^sut, :backup, [{_uuid, []}]}}
