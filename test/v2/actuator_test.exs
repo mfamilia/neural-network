@@ -11,21 +11,23 @@ defmodule NN.V2.ActuatorTest do
     [sut: sut, exo_self: exo_self]
   end
 
-  test "create sensor", %{sut: sut} do
+  test "create actuator", %{sut: sut} do
     assert Process.alive?(sut)
   end
 
   test "cortex sync", %{sut: sut, exo_self: exo_self} do
-    id = :id
-    cortex = exo_self
-    actuator_type = :print_results
-    neurons = [exo_self]
+    with_mock IO, [puts: fn(x) -> send exo_self, {:printed, x} end] do
+      id = :id
+      cortex = exo_self
+      actuator_type = :print_results
+      neurons = [exo_self]
 
-    Actuator.initialize(sut, exo_self, id, cortex, actuator_type, neurons)
+      Actuator.initialize(sut, exo_self, id, cortex, actuator_type, neurons)
 
-    Actuator.forward(sut, exo_self, [1, 2])
+      Actuator.forward(sut, exo_self, [1, 2])
 
-    assert_receive {:"$gen_cast", {^sut, :sync}}
+      assert_receive {:"$gen_cast", {^sut, :sync}}
+    end
   end
 
   test "print results", %{sut: sut, exo_self: exo_self} do
@@ -33,8 +35,8 @@ defmodule NN.V2.ActuatorTest do
       id = :id
       cortex = exo_self
       actuator_type = :print_results
-      {:ok, neuron1} = Neuron.start_link
-      {:ok, neuron2} = Neuron.start_link
+      {:ok, neuron1} = Neuron.start_link(exo_self)
+      {:ok, neuron2} = Neuron.start_link(exo_self)
       neurons = [neuron1, neuron2]
 
       Actuator.initialize(sut, exo_self, id, cortex, actuator_type, neurons)

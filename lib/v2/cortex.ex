@@ -81,9 +81,11 @@ defmodule NN.V2.Cortex do
   end
 
   defp neuron_data(%{neurons: neurons}) do
+    cortex = self()
+
     neurons
       |> Enum.map(fn(n) ->
-        {^n, id, weights} = Neuron.backup(n)
+        {^n, id, weights} = Neuron.backup(n, cortex)
 
         {id, weights}
       end)

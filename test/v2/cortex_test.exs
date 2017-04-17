@@ -46,7 +46,8 @@ defmodule NN.V2.CortexTest do
     Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator1} = Actuator.start_link(exo_self)
     {:ok, actuator2} = Actuator.start_link(exo_self)
-    {:ok, neuron} = Neuron.start_link
+    {:ok, neuron} = Neuron.start_link(exo_self)
+    Neuron.initialize(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
     cycles = 3
 
     Cortex.initialize(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron], cycles)
@@ -68,7 +69,8 @@ defmodule NN.V2.CortexTest do
     {:ok, sensor} = Sensor.start_link(exo_self)
     Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator} = Actuator.start_link(exo_self)
-    {:ok, neuron} = Neuron.start_link
+    {:ok, neuron} = Neuron.start_link(exo_self)
+    Neuron.initialize(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
     cycles = 3
 
     Cortex.initialize(sut, exo_self, id, [sensor], [actuator], [neuron], cycles)
