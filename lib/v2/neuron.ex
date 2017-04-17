@@ -86,8 +86,12 @@ defmodule NN.V2.Neuron do
     {:noreply, state}
   end
 
+  def tanh(value) do
+    :math.tanh(value)
+  end
+
   defp forward_signal(outputs, signal, activation_function) do
-    result = activation_function.(signal)
+    result = apply(__MODULE__, activation_function, [signal])
     from = self()
 
     Enum.each(outputs, fn(x) ->

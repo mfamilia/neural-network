@@ -16,7 +16,7 @@ defmodule NN.V2.NeuronTest do
   test "backup inputs", %{sut: sut, exo_self: exo_self} do
     id = :id
     cortex = exo_self
-    activation_function = &:math.tanh/1
+    activation_function = :tanh
     weights = [0 , 1]
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
@@ -29,7 +29,7 @@ defmodule NN.V2.NeuronTest do
   test "forwards signal to output", %{sut: sut, exo_self: exo_self} do
     id = :id
     cortex = exo_self
-    activation_function = &:math.tanh/1
+    activation_function = :tanh
     weights = [0 , 1]
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
@@ -45,7 +45,7 @@ defmodule NN.V2.NeuronTest do
   test "forwards signal to output with bias", %{sut: sut, exo_self: exo_self} do
     id = :id
     cortex = exo_self
-    activation_function = &:math.tanh/1
+    activation_function = :tanh
     weights = [0 , 1]
     inputs = [{exo_self, weights} | 1]
     outputs = [exo_self]
@@ -61,7 +61,7 @@ defmodule NN.V2.NeuronTest do
   test "forwards signal to output with multiple inputs", %{sut: sut, exo_self: exo_self} do
     id = :id
     cortex = exo_self
-    activation_function = &:math.tanh/1
+    activation_function = :tanh
     {:ok, neuron1} = Neuron.start_link(exo_self)
     {:ok, neuron2} = Neuron.start_link(exo_self)
     inputs = [{exo_self, [1, 0]}, {neuron1, [1, 1]}, {neuron2, [0, 0]}]
