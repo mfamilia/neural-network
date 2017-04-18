@@ -25,6 +25,6 @@ defmodule NN.Handlers.GenotypeFileTest do
 
     Process.sleep(100)
 
-    assert {:ok, "foobar\n"} = File.read(file_name)
+    assert {:ok, "foobar.\n"} = File.read(file_name)
   end
 end

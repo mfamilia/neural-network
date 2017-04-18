@@ -11,7 +11,7 @@ defmodule NN.Handlers.GenotypeFile do
 
   def handle_cast({:genotype, genotype}, file_name) do
     {:ok, file} = File.open(file_name, [:write])
-    Enum.each(genotype, fn(x) -> :io.format(file, "~p~n", [x]) end)
+    Enum.each(genotype, fn(x) -> :io.format(file, "~p.~n", [x]) end)
     File.close(file)
 
     {:noreply, file_name}
