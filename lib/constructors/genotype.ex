@@ -63,8 +63,8 @@ defmodule NN.Constructors.Genotype do
         neuron(n, :id)
       end)
 
-    sensor = sensor(s, cortex_id: cortex_id, fanned_out_ids: first_layer_neuron_ids)
-    actuator = actuator(a, cortex_id: cortex_id, fanned_in_ids: last_layer_neuron_ids)
+    sensor = sensor(s, cortex_id: cortex_id, neuron_ids: first_layer_neuron_ids)
+    actuator = actuator(a, cortex_id: cortex_id, neuron_ids: last_layer_neuron_ids)
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
     genotype = List.flatten([cortex, sensor, actuator | neurons])
 

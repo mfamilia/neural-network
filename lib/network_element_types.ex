@@ -6,14 +6,14 @@ defmodule NN.NetworkElementTypes do
     cortex_id: Tuple,
     type: Atom,
     vector_length: Integer,
-    fanned_out_ids: List
+    neuron_ids: List
 
   Record.defrecord :actuator,
     id: Tuple,
     cortex_id: Tuple,
     type: Atom,
     vector_length: Integer,
-    fanned_in_ids: List
+    neuron_ids: List
 
   Record.defrecord :neuron,
     id: Tuple,

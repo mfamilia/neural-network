@@ -9,13 +9,13 @@ defmodule NN.NetworkElementTypesTest do
                cortex_id: {:cortex, 32.4},
                type: :type,
                vector_length: 3,
-               fanned_out_ids: [:id])
+               neuron_ids: [:id])
 
     assert sensor(s, :id) == {:sensor, 123.4}
     assert sensor(s, :cortex_id) == {:cortex, 32.4}
     assert sensor(s, :type) == :type
     assert sensor(s, :vector_length) == 3
-    assert sensor(s, :fanned_out_ids) == [:id]
+    assert sensor(s, :neuron_ids) == [:id]
   end
 
   test "create actuator records" do
@@ -23,13 +23,13 @@ defmodule NN.NetworkElementTypesTest do
                  cortex_id: {:cortex, 32.4},
                  type: :type,
                  vector_length: 3,
-                 fanned_in_ids: [:id])
+                 neuron_ids: [:id])
 
     assert actuator(s, :id) == {:actuator, 123.4}
     assert actuator(s, :cortex_id) == {:cortex, 32.4}
     assert actuator(s, :type) == :type
     assert actuator(s, :vector_length) == 3
-    assert actuator(s, :fanned_in_ids) == [:id]
+    assert actuator(s, :neuron_ids) == [:id]
   end
 
   test "create neuron records" do
