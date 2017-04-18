@@ -4,8 +4,8 @@ defmodule NN.Constructors.GenotypeTest do
 
   setup do
     handler = self()
-    sensor_type = :rng
-    actuator_type = :pts
+    sensor_type = :random
+    actuator_type = :print_results
     hidden_layer_densities = [1, 3]
 
     {:ok, pid} = Genotype.start_link(handler,
@@ -49,7 +49,7 @@ defmodule NN.Constructors.GenotypeTest do
 
     assert_receive {:"$gen_cast", {:genotype, genotype}}
     assert [_cortex, sensor | _] = genotype
-    assert {:sensor, id, cortex_id, :rng, 2, neurons} = sensor
+    assert {:sensor, id, cortex_id, :random, 2, neurons} = sensor
     assert {:sensor, _uuid} = id
     assert {:cortex, _uuid} = cortex_id
     assert [{:neuron, {1, _uuid}}] = neurons
@@ -60,7 +60,7 @@ defmodule NN.Constructors.GenotypeTest do
 
     assert_receive {:"$gen_cast", {:genotype, genotype}}
     assert [_cortex, _sensor, actuator | _] = genotype
-    assert {:actuator, id, cortex_id, :pts, 1, neurons} = actuator
+    assert {:actuator, id, cortex_id, :print_results, 1, neurons} = actuator
     assert {:actuator, _uuid} = id
     assert {:cortex, _uuid} = cortex_id
     assert [{:neuron, {3, _uuid}}] = neurons

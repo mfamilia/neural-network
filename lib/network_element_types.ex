@@ -4,14 +4,14 @@ defmodule NN.NetworkElementTypes do
   Record.defrecord :sensor,
     id: Tuple,
     cortex_id: Tuple,
-    name: Atom,
+    type: Atom,
     vector_length: Integer,
     fanned_out_ids: List
 
   Record.defrecord :actuator,
     id: Tuple,
     cortex_id: Tuple,
-    name: Atom,
+    type: Atom,
     vector_length: Integer,
     fanned_in_ids: List
 

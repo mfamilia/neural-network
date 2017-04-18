@@ -5,10 +5,10 @@ defmodule NN.Constructors.SensorTest do
   use ExUnit.Case
 
   test "create rng sensor record" do
-    result = Sensor.create_sensor(:rng)
+    result = Sensor.create_sensor(:random)
 
     assert Record.is_record(result, :sensor)
-    assert {:sensor, {:sensor, _uuid}, Tuple, :rng, 2, List} = result
+    assert {:sensor, {:sensor, _uuid}, Tuple, :random, 2, List} = result
   end
 
   test "unsupported sensor type" do

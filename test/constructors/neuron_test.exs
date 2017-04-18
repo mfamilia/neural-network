@@ -6,8 +6,8 @@ defmodule NN.Constructors.NeuronTest do
 
   setup do
     cortex_id = {:cortex, UUID.uuid4}
-    sensor = sensor(id: {:sensor, UUID.uuid4}, name: :rng, vector_length: 2)
-    actuator = actuator(id: {:actuator, UUID.uuid4}, name: :pts, vector_length: 1)
+    sensor = sensor(id: {:sensor, UUID.uuid4}, type: :random, vector_length: 2)
+    actuator = actuator(id: {:actuator, UUID.uuid4}, type: :print_results, vector_length: 1)
     layer_densities = [1, 3, 1]
 
     {
@@ -29,10 +29,7 @@ defmodule NN.Constructors.NeuronTest do
   end
 
   test "input layer neurons", %{input_layer: i} do
-    assert [{:neuron, id, cortex, af, inputs, outputs}] = i
-    assert is_function(af, 1)
-    expected_af = &:math.tanh/1
-    assert expected_af == af
+    assert [{:neuron, id, cortex, :tanh, inputs, outputs}] = i
     assert {:neuron, {1, _uuid}} = id
     assert {:cortex, _uuid} = cortex
     assert [{sensor, weights}, {:bias, bias}] = inputs
@@ -55,9 +52,7 @@ defmodule NN.Constructors.NeuronTest do
   end
 
   test "output layer neurons", %{output_layer: o} do
-    assert [{:neuron, id, cortex, af, inputs, outputs}] = o
-    expected_af = &:math.tanh/1
-    assert expected_af == af
+    assert [{:neuron, id, cortex, :tanh, inputs, outputs}] = o
     assert {:neuron, {3, _uuid}} = id
     assert {:cortex, _uuid} = cortex
     assert [neuron1, neuron2, neuron3, {:bias, bias}] = inputs

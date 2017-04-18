@@ -7,13 +7,13 @@ defmodule NN.NetworkElementTypesTest do
   test "create sensor records" do
     s = sensor(id: {:sensor, 123.4},
                cortex_id: {:cortex, 32.4},
-               name: :name,
+               type: :type,
                vector_length: 3,
                fanned_out_ids: [:id])
 
     assert sensor(s, :id) == {:sensor, 123.4}
     assert sensor(s, :cortex_id) == {:cortex, 32.4}
-    assert sensor(s, :name) == :name
+    assert sensor(s, :type) == :type
     assert sensor(s, :vector_length) == 3
     assert sensor(s, :fanned_out_ids) == [:id]
   end
@@ -21,13 +21,13 @@ defmodule NN.NetworkElementTypesTest do
   test "create actuator records" do
     s = actuator(id: {:actuator, 123.4},
                  cortex_id: {:cortex, 32.4},
-                 name: :name,
+                 type: :type,
                  vector_length: 3,
                  fanned_in_ids: [:id])
 
     assert actuator(s, :id) == {:actuator, 123.4}
     assert actuator(s, :cortex_id) == {:cortex, 32.4}
-    assert actuator(s, :name) == :name
+    assert actuator(s, :type) == :type
     assert actuator(s, :vector_length) == 3
     assert actuator(s, :fanned_in_ids) == [:id]
   end

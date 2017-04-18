@@ -84,7 +84,7 @@ defmodule NN.Constructors.Neuron do
 
     neuron(id: id,
       cortex_id: cortex_id,
-      activation_function: &:math.tanh(&1),
+      activation_function: :tanh,
       input_ids: proper_input_idps,
       output_ids: output_ids)
   end

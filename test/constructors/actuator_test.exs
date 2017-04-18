@@ -5,10 +5,10 @@ defmodule NN.Constructors.ActuatorTest do
   use ExUnit.Case
 
   test "create pts actuator record" do
-    result = Actuator.create_actuator(:pts)
+    result = Actuator.create_actuator(:print_results)
 
     assert Record.is_record(result, :actuator)
-    assert {:actuator, {:actuator, _uuid}, Tuple, :pts, 1, List} = result
+    assert {:actuator, {:actuator, _uuid}, Tuple, :print_results, 1, List} = result
   end
 
   test "unsupported actuator type" do
