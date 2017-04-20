@@ -9,14 +9,15 @@ defmodule NN.V2.ExoSelf do
     defstruct file_name: nil,
       genotype: nil,
       store: nil,
-      cortex: nil
+      cortex: nil,
+      handler: nil
   end
 
-  def start_link(file_name) do
-    GenServer.start_link(__MODULE__, file_name)
+  def start_link(file_name, handler) do
+    GenServer.start_link(__MODULE__, {file_name, handler})
   end
 
-  def init(file_name) do
+  def init({file_name, handler}) do
     {:ok, genotype} = :file.consult(file_name)
     store = :ets.new(:pid_store, [:set, :private])
 
@@ -24,7 +25,8 @@ defmodule NN.V2.ExoSelf do
       file_name: file_name,
       genotype: genotype,
       store: store,
-      cortex: map_neural_network(genotype, store)
+      cortex: map_neural_network(genotype, store),
+      handler: handler
     }
 
     {:ok, state}
@@ -34,7 +36,8 @@ defmodule NN.V2.ExoSelf do
     GenServer.cast(pid, {from, :backup, data})
   end
 
-  def handle_cast({cortex, :backup, data}, %{cortex: cortex} = state) do
+  def handle_cast({cortex, :backup, data}, %{cortex: cortex, handler: handler} = state) do
+    GenServer.cast(handler, {:backup, data})
     {:noreply, state}
   end
 
@@ -63,6 +66,8 @@ defmodule NN.V2.ExoSelf do
       neuron_ids,
       store
     )
+
+    cortex_pid
   end
 
   defp start_network_elements(exo_self, store, type, [id | ids]) do

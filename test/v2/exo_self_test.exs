@@ -2,15 +2,17 @@ defmodule NN.V2.ExoSelfTest do
   use ExUnit.Case
   alias NN.V2.ExoSelf
 
-  setup do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+  import Mock
 
-    {:ok, sut} = ExoSelf.start_link(file_name)
+  test "backup" do
+    with_mock IO, [puts: fn(_) -> :ok end] do
+      genotype_handler = self()
+      file_name = "./test/fixtures/genotypes/simple.nn"
 
-    [sut: sut]
-  end
+      {:ok, sut} = ExoSelf.start_link(file_name, genotype_handler)
+      assert Process.alive?(sut)
 
-  test "create exo self", %{sut: sut} do
-    assert Process.alive?(sut)
+      assert_receive {:"$gen_cast", {:backup, _data}}
+    end
   end
 end
