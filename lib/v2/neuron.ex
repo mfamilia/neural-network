@@ -50,10 +50,10 @@ defmodule NN.V2.Neuron do
   end
 
   def handle_cast({from, :forward, signal}, %{inputs: [{from, weights}]} = state) do
-    handle_cast({from, :forward, signal}, %{state | inputs: [{from, weights} | 0]})
+    handle_cast({from, :forward, signal}, %{state | inputs: [{from, weights} | [0]]})
   end
 
-  def handle_cast({from, :forward, signal}, %{inputs: [{from, weights} | bias]} = state) when is_number(bias) do
+  def handle_cast({from, :forward, signal}, %{inputs: [{from, weights} | [bias]]} = state) when is_number(bias) do
     result = dot_product(signal, weights)
 
     %{
@@ -95,7 +95,7 @@ defmodule NN.V2.Neuron do
     from = self()
 
     Enum.each(outputs, fn(x) ->
-      forward(x, from, result)
+      forward(x, from, [result])
     end)
   end
 

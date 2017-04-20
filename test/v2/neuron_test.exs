@@ -38,7 +38,7 @@ defmodule NN.V2.NeuronTest do
 
     Neuron.forward(sut, exo_self, [1, 2])
 
-    assert_receive {:"$gen_cast", {^sut, :forward, signal}}
+    assert_receive {:"$gen_cast", {^sut, :forward, [signal]}}
     assert is_number(signal)
   end
 
@@ -47,14 +47,14 @@ defmodule NN.V2.NeuronTest do
     cortex = exo_self
     activation_function = :tanh
     weights = [0 , 1]
-    inputs = [{exo_self, weights} | 1]
+    inputs = [{exo_self, weights} | [1]]
     outputs = [exo_self]
 
     Neuron.initialize(sut, exo_self, id, cortex, activation_function, inputs, outputs)
 
     Neuron.forward(sut, exo_self, [1, 2])
 
-    assert_receive {:"$gen_cast", {^sut, :forward, signal}}
+    assert_receive {:"$gen_cast", {^sut, :forward, [signal]}}
     assert is_number(signal)
   end
 
@@ -77,7 +77,7 @@ defmodule NN.V2.NeuronTest do
 
     Neuron.forward(sut, exo_self, [1, 2])
 
-    assert_receive {:"$gen_cast", {^sut, :forward, signal}}
+    assert_receive {:"$gen_cast", {^sut, :forward, [signal]}}
     assert is_number(signal)
   end
 end

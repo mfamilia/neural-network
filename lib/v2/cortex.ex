@@ -1,6 +1,6 @@
 defmodule NN.V2.Cortex do
   use GenServer
-  alias NN.V2.{Sensor, Neuron}
+  alias NN.V2.{Sensor, Neuron, ExoSelf}
 
   defmodule State do
     defstruct exo_self: nil,
@@ -77,7 +77,7 @@ defmodule NN.V2.Cortex do
 
   defp send_backup(%{exo_self: exo_self} = state) do
     neuron_data = neuron_data(state)
-    GenServer.cast(exo_self, {self(), :backup, neuron_data})
+    ExoSelf.backup(exo_self, self(), neuron_data)
   end
 
   defp neuron_data(%{neurons: neurons}) do
