@@ -2,6 +2,8 @@ defmodule NN.V2.Actuator do
   use GenServer
   alias NN.V2.Cortex
 
+  @io %{puts: &IO.puts/1}
+
   defmodule State do
     defstruct exo_self: nil,
       id: nil,
@@ -9,11 +11,13 @@ defmodule NN.V2.Actuator do
       actuator_type: nil,
       neurons: nil,
       memory: nil,
-      signals: nil
+      signals: nil,
+      io: nil
   end
 
-  def start_link(exo_self) do
-    GenServer.start_link(__MODULE__, exo_self)
+  def start_link(exo_self, io \\ @io) do
+    state = %State{exo_self: exo_self, io: io}
+    GenServer.start_link(__MODULE__, state)
   end
 
   def initialize(pid, exo_self, id, cortex, actuator_type, neurons) do
@@ -24,9 +28,8 @@ defmodule NN.V2.Actuator do
     GenServer.cast(pid, {from, :forward, signal})
   end
 
-  def handle_cast({exo_self, {id, cortex, actuator_type, neurons}}, exo_self) do
-    state = %State{
-      exo_self: exo_self,
+  def handle_cast({exo_self, {id, cortex, actuator_type, neurons}}, %{exo_self: exo_self} = state) do
+    state = %{state |
       id: id,
       cortex: cortex,
       actuator_type: actuator_type,
@@ -43,11 +46,12 @@ defmodule NN.V2.Actuator do
       cortex: c,
       memory: neurons,
       signals: signals,
-      actuator_type: type
+      actuator_type: type,
+      io: io
     } = state
 
     trigger_cortex(c)
-    apply(__MODULE__, type, [[signal | signals]])
+    apply(__MODULE__, type, [[signal | signals], io])
 
     state = %{state | neurons: neurons, signals: []}
 
@@ -70,9 +74,9 @@ defmodule NN.V2.Actuator do
     Cortex.sync(cortex, self())
   end
 
-  def print_results(results) do
+  def print_results(results, io) do
     reversed_results = Enum.reverse(results)
 
-    IO.puts "Actuator signals: #{inspect reversed_results}"
+    io.puts.("Actuator signals: #{inspect reversed_results}")
   end
 end
