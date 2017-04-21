@@ -36,9 +36,38 @@ defmodule NN.V2.ExoSelf do
     GenServer.cast(pid, {from, :backup, data})
   end
 
-  def handle_cast({cortex, :backup, data}, %{cortex: cortex, handler: handler} = state) do
-    GenServer.cast(handler, {:backup, data})
+  def handle_cast({cortex, :backup, neuron_data}, %{cortex: cortex, handler: handler} = state) do
+    %{genotype: g, store: s} = state
+    updated_genotype = update_genotype(g, s, neuron_data)
+
+    GenServer.cast(handler, {:genotype, updated_genotype})
+
     {:noreply, state}
+  end
+
+  defp update_genotype(genotype, store, [{id, pid_weights} | neurons]) do
+    neuron = List.keyfind(genotype, id, 1)
+    updated_inputs = convert_pid_weights_to_id_weights(pid_weights, store, [])
+    updated_neuron = neuron(neuron, input_ids: updated_inputs)
+    updated_genotype = List.keyreplace(genotype, id, 1, updated_neuron)
+    update_genotype(updated_genotype, store, neurons)
+  end
+
+  defp update_genotype(genotype, _store, []) do
+    genotype
+  end
+
+  defp convert_pid_weights_to_id_weights([{pid, weights} | inputs], store, acc) do
+    id = convert_pid_to_id(pid, store)
+    convert_pid_weights_to_id_weights(inputs, store, [{id, weights} | acc])
+  end
+
+  defp convert_pid_weights_to_id_weights([], store, acc) do
+    convert_pid_weights_to_id_weights([0], store, acc)
+  end
+
+  defp convert_pid_weights_to_id_weights([bias], _store, acc) do
+    Enum.reverse([{:bias, bias} | acc])
   end
 
   defp map_neural_network(genotype, store) do
@@ -181,5 +210,9 @@ defmodule NN.V2.ExoSelf do
 
   defp convert_id_to_pid(id, store) do
     :ets.lookup_element(store, id, 2)
+  end
+
+  defp convert_pid_to_id(id, store) do
+    convert_id_to_pid(id, store)
   end
 end

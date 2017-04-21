@@ -1,5 +1,5 @@
 defmodule NN.V2.ExoSelfTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
   alias NN.V2.ExoSelf
 
   import Mock
@@ -12,7 +12,7 @@ defmodule NN.V2.ExoSelfTest do
       {:ok, sut} = ExoSelf.start_link(file_name, genotype_handler)
       assert Process.alive?(sut)
 
-      assert_receive {:"$gen_cast", {:backup, _data}}
+      assert_receive {:"$gen_cast", {:genotype, _genotype}}
     end
   end
 end
