@@ -36,13 +36,13 @@ defmodule NN.NetworkElementTypesTest do
     n = neuron(id: {:neuron, 24.5},
                cortex_id: {:cortex, 32.4},
                activation_function: &:math.tanh(&1),
-               input_ids: [:id],
+               input_weights: [:id],
                output_ids: [:id])
 
     assert neuron(n, :id) == {:neuron, 24.5}
     assert neuron(n, :cortex_id) == {:cortex, 32.4}
     assert neuron(n, :activation_function) == &:math.tanh(&1)
-    assert neuron(n, :input_ids) == [:id]
+    assert neuron(n, :input_weights) == [:id]
     assert neuron(n, :output_ids) == [:id]
   end
 

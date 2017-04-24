@@ -19,9 +19,7 @@ defmodule NN.NetworkElementTypes do
     id: Tuple,
     cortex_id: Tuple,
     activation_function: Fun,
-    #Need to rename this to input_id_weights
-    input_ids: List,
-    #Need to rename this to output_id_weights
+    input_weights: List,
     output_ids: List
 
   Record.defrecord :cortex,

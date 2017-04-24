@@ -6,7 +6,7 @@ defmodule NN.V2.Neuron do
       id: nil,
       cortex: nil,
       activation_function: nil,
-      inputs: nil,
+      input_weights: nil,
       outputs: nil,
       memory: nil,
       accumulator: nil
@@ -24,8 +24,8 @@ defmodule NN.V2.Neuron do
     GenServer.cast(pid, {from, :forward, signal})
   end
 
-  def initialize(pid, exo_self, id, cortex, activation_function, inputs, outputs) do
-    GenServer.cast(pid, {exo_self, {id, cortex, activation_function, inputs, outputs}})
+  def initialize(pid, exo_self, id, cortex, activation_function, input_weights, outputs) do
+    GenServer.cast(pid, {exo_self, {id, cortex, activation_function, input_weights, outputs}})
   end
 
   def handle_call({cortex, :backup}, _from, %{cortex: cortex} = state) do
@@ -34,26 +34,26 @@ defmodule NN.V2.Neuron do
     {:reply, {self(), id, memory}, state}
   end
 
-  def handle_cast({exo_self, {id, cortex, activation_function, inputs, outputs}}, exo_self) do
+  def handle_cast({exo_self, {id, cortex, activation_function, input_weights, outputs}}, exo_self) do
     state = %State{
       exo_self: exo_self,
       id: id,
       cortex: cortex,
       activation_function: activation_function,
-      inputs: inputs,
+      input_weights: input_weights,
       outputs: outputs,
-      memory: inputs,
+      memory: input_weights,
       accumulator: 0
     }
 
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{inputs: [{from, weights}]} = state) do
-    handle_cast({from, :forward, signal}, %{state | inputs: [{from, weights} | [0]]})
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights}]} = state) do
+    handle_cast({from, :forward, signal}, %{state | input_weights: [{from, weights} | [0]]})
   end
 
-  def handle_cast({from, :forward, signal}, %{inputs: [{from, weights} | [bias]]} = state) when is_number(bias) do
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | [bias]]} = state) when is_number(bias) do
     result = dot_product(signal, weights)
 
     %{
@@ -65,17 +65,17 @@ defmodule NN.V2.Neuron do
 
     forward_signal(outputs, result + accumulator + bias, af)
 
-    state = %{state | inputs: memory, accumulator: 0}
+    state = %{state | input_weights: memory, accumulator: 0}
 
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{inputs: [{from, weights} | inputs]} = state) do
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | input_weights]} = state) do
     %{accumulator: accumulator} = state
 
     result = dot_product(signal, weights)
 
-    state = %{state | inputs: inputs, accumulator: result + accumulator}
+    state = %{state | input_weights: input_weights, accumulator: result + accumulator}
 
     {:noreply, state}
   end

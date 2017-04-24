@@ -47,8 +47,8 @@ defmodule NN.V2.ExoSelf do
 
   defp update_genotype(genotype, store, [{id, pid_weights} | neurons]) do
     neuron = List.keyfind(genotype, id, 1)
-    updated_inputs = convert_pid_weights_to_id_weights(pid_weights, store, [])
-    updated_neuron = neuron(neuron, input_ids: updated_inputs)
+    updated_input_weights = convert_pid_weights_to_id_weights(pid_weights, store, [])
+    updated_neuron = neuron(neuron, input_weights: updated_input_weights)
     updated_genotype = List.keyreplace(genotype, id, 1, updated_neuron)
     update_genotype(updated_genotype, store, neurons)
   end
@@ -157,7 +157,7 @@ defmodule NN.V2.ExoSelf do
     id = neuron(r, :id)
     pid = convert_id_to_pid(id, store)
     af = neuron(r, :activation_function)
-    inputs = convert_input_ids_to_pids(neuron(r, :input_ids), store)
+    inputs = convert_input_ids_to_pids(neuron(r, :input_weights), store)
     outputs = convert_ids_to_pids(neuron(r, :output_ids), store)
 
     Neuron.initialize(pid,

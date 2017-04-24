@@ -80,22 +80,22 @@ defmodule NN.Constructors.Neuron do
   end
 
   def create_neuron(input_idps, id, cortex_id, output_ids) do
-    proper_input_idps = create_neural_input(input_idps, [])
+    input_weights = create_neural_input(input_idps, [])
 
     neuron(id: id,
       cortex_id: cortex_id,
       activation_function: :tanh,
-      input_ids: proper_input_idps,
+      input_weights: input_weights,
       output_ids: output_ids)
   end
 
-  def create_neural_input([{input_id, input_vector_length}|input_idps], acc) do
+  def create_neural_input([{input_id, input_vector_length} | input_idps], acc) do
     weights =  create_neural_weights(input_vector_length, [])
-    create_neural_input(input_idps, [{input_id, weights}|acc])
+    create_neural_input(input_idps, [{input_id, weights} | acc])
   end
 
   def create_neural_input([], acc) do
-    Enum.reverse([{:bias, Random.uniform - 0.5}|acc])
+    Enum.reverse([{:bias, Random.uniform - 0.5} | acc])
   end
 
   def create_neural_weights(0, acc) do
@@ -104,6 +104,6 @@ defmodule NN.Constructors.Neuron do
 
   def create_neural_weights(index, acc) do
     w = Random.uniform - 0.5
-    create_neural_weights(index-1, [w|acc])
+    create_neural_weights(index - 1, [w | acc])
   end
 end
