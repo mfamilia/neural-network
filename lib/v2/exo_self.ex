@@ -6,41 +6,52 @@ defmodule NN.V2.ExoSelf do
   alias NN.V2.{Cortex, Sensor, Actuator, Neuron}
 
   defmodule State do
-    defstruct file_name: nil,
-      genotype: nil,
+    defstruct genotype: nil,
       store: nil,
       cortex: nil,
       handler: nil
   end
 
-  def start_link(file_name, handler) do
-    GenServer.start_link(__MODULE__, {file_name, handler})
+  def start_link(handler) do
+    GenServer.start_link(__MODULE__, handler)
   end
 
-  def init({file_name, handler}) do
-    {:ok, genotype} = :file.consult(file_name)
-    store = :ets.new(:pid_store, [:set, :private])
-
+  def init(handler) do
     state = %State{
-      file_name: file_name,
-      genotype: genotype,
-      store: store,
-      cortex: map_neural_network(genotype, store),
       handler: handler
     }
 
+    initialize(self())
+
     {:ok, state}
+  end
+
+  def initialize(pid) do
+    GenServer.cast(pid, :initialize)
   end
 
   def backup(pid, from, data) do
     GenServer.cast(pid, {from, :backup, data})
   end
 
+  def handle_cast(:initialize, %{handler: handler} = state) do
+    {:ok, genotype} = GenServer.call(handler, :load)
+    store = :ets.new(:pid_store, [:set, :private])
+
+    state = %State{state |
+      genotype: genotype,
+      store: store,
+      cortex: map_neural_network(genotype, store),
+    }
+
+    {:noreply, state}
+  end
+
   def handle_cast({cortex, :backup, neuron_data}, %{cortex: cortex, handler: handler} = state) do
     %{genotype: g, store: s} = state
     updated_genotype = update_genotype(g, s, neuron_data)
 
-    GenServer.cast(handler, {:genotype, updated_genotype})
+    GenServer.cast(handler, {:save, updated_genotype})
 
     {:noreply, state}
   end
