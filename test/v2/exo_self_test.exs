@@ -1,7 +1,7 @@
 defmodule NN.V2.ExoSelfTest do
   use ExUnit.Case, async: false
   alias NN.V2.ExoSelf
-  alias NN.Genotype
+  alias NN.Handlers.Genotype
 
   import Mock
 

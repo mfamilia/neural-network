@@ -4,11 +4,10 @@ defmodule NN.V2.ExoSelf do
   import Record
 
   alias NN.V2.{Cortex, Sensor, Actuator, Neuron}
-  alias NN.Genotype
+  alias NN.Handlers.Genotype, as: Handler
 
   defmodule State do
-    defstruct genotype: nil,
-      store: nil,
+    defstruct store: nil,
       cortex: nil,
       handler: nil
   end
@@ -36,23 +35,23 @@ defmodule NN.V2.ExoSelf do
   end
 
   def handle_cast({cortex, :backup, neuron_data}, %{cortex: cortex, handler: handler} = state) do
-    %{genotype: g, store: s} = state
+    %{store: s} = state
 
     :ok = update_genotype(handler, s, neuron_data)
 
-    Genotype.save(handler)
+    Handler.save(handler)
 
     {:noreply, state}
   end
 
-  defp update_genotype(genotype, store, [{id, pid_weights} | neurons]) do
-    {:ok, neuron} = Genotype.element(genotype, id)
+  defp update_genotype(handler, store, [{id, pid_weights} | neurons]) do
+    {:ok, neuron} = Handler.element(handler, id)
     updated_input_weights = convert_pid_weights_to_id_weights(pid_weights, store, [])
     updated_neuron = neuron(neuron, input_weights: updated_input_weights)
 
-    Genotype.update(genotype, updated_neuron)
+    Handler.update(handler, updated_neuron)
 
-    update_genotype(genotype, store, neurons)
+    update_genotype(handler, store, neurons)
   end
 
   defp update_genotype(_handler, _store, []), do: :ok
@@ -72,7 +71,7 @@ defmodule NN.V2.ExoSelf do
 
   defp initial_state(handler) do
     store = :ets.new(:pid_store, [:set, :private])
-    {:ok, cortex} = Genotype.cortex(handler)
+    {:ok, cortex} = Handler.cortex(handler)
 
     sensor_ids = cortex(cortex, :sensor_ids)
     actuator_ids = cortex(cortex, :actuator_ids)
@@ -87,13 +86,13 @@ defmodule NN.V2.ExoSelf do
 
     cortex_pid = :ets.lookup_element(store, cortex_id, 2)
 
-    {:ok, sensors} = Genotype.sensors(handler)
+    {:ok, sensors} = Handler.sensors(handler)
     link_network_elements(sensors, store, cortex_pid, exo_self)
 
-    {:ok, neurons} = Genotype.neurons(handler)
+    {:ok, neurons} = Handler.neurons(handler)
     link_network_elements(neurons, store, cortex_pid, exo_self)
 
-    {:ok, actuators} = Genotype.actuators(handler)
+    {:ok, actuators} = Handler.actuators(handler)
     link_network_elements(actuators, store, cortex_pid, exo_self)
 
     link_cortex(

@@ -1,6 +1,6 @@
-defmodule NN.GenotypeTest do
+defmodule NN.Handlers.GenotypeTest do
   use ExUnit.Case, async: false
-  alias NN.Genotype
+  alias NN.Handlers.Genotype
 
   require Record
 

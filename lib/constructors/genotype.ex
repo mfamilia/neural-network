@@ -66,8 +66,11 @@ defmodule NN.Constructors.Genotype do
     sensor = sensor(s, cortex_id: cortex_id, neuron_ids: first_layer_neuron_ids)
     actuator = actuator(a, cortex_id: cortex_id, neuron_ids: last_layer_neuron_ids)
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
-    genotype = List.flatten([cortex, sensor, actuator | neurons])
+    List.flatten([cortex, sensor, actuator | neurons])
+      |> Enum.each(fn(e) ->
+        GenServer.cast(handler, {:update, e})
+      end)
 
-    GenServer.cast(handler, {:save, genotype})
+    GenServer.cast(handler, :save)
   end
 end

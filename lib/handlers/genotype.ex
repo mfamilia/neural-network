@@ -1,4 +1,4 @@
-defmodule NN.Genotype do
+defmodule NN.Handlers.Genotype do
   use GenServer
 
   defmodule State do
