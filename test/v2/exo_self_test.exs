@@ -1,22 +1,46 @@
 defmodule NN.V2.ExoSelfTest do
   use ExUnit.Case, async: false
   alias NN.V2.ExoSelf
+  alias NN.Genotype
 
   import Mock
 
   test "backup" do
     with_mock IO, [puts: fn(_) -> :ok end] do
-      genotype_handler = self()
+      genotype = self()
       file_name = "./test/fixtures/genotypes/simple.nn"
-      {:ok, genotype} = :file.consult(file_name)
 
-      {:ok, _sut} = ExoSelf.start_link(genotype_handler)
+      {:ok, source} = Genotype.start_link(file_name)
+      :ok = Genotype.load(source)
+      {:ok, _sut} = ExoSelf.start_link(genotype)
 
-      assert_receive {:"$gen_call", from, :load}
-      GenServer.reply(from, {:ok, genotype})
+      assert_receive {:"$gen_call", from, :cortex}
 
-      assert_receive {:"$gen_cast", {:save, genotype}}
-      assert length(genotype) == 8
+      {:ok, cortex} = Genotype.cortex(source)
+      GenServer.reply(from, {:ok, cortex})
+
+      assert_receive {:"$gen_call", from, :sensors}
+
+      {:ok, sensors} = Genotype.sensors(source)
+      GenServer.reply(from, {:ok, sensors})
+
+      assert_receive {:"$gen_call", from, :neurons}
+
+      {:ok, neurons} = Genotype.neurons(source)
+      GenServer.reply(from, {:ok, neurons})
+
+      assert_receive {:"$gen_call", from, :actuators}
+
+      {:ok, actuators} = Genotype.actuators(source)
+      GenServer.reply(from, {:ok, actuators})
+
+      Enum.each(1..5, fn(_) ->
+        assert_receive {:"$gen_call", from, {:element, id}}
+        {:ok, element} = Genotype.element(source, id)
+        GenServer.reply(from, {:ok, element})
+      end)
+
+      assert_receive {:"$gen_cast", :save}
     end
   end
 end

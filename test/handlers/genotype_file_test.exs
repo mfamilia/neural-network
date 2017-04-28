@@ -20,19 +20,12 @@ defmodule NN.Handlers.GenotypeFileTest do
   end
 
   test "save genotype to file", %{sut: sut, file_name: file_name} do
-    genotype = [:foobar]
+    genotype = [{:foo, :id, :bar}]
     GenotypeFile.save(sut, genotype)
 
     Process.sleep(100)
 
-    assert {:ok, "foobar.\n"} = File.read(file_name)
-  end
-
-  test "load genotype from file" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
-    {:ok, sut} = GenotypeFile.start_link(file_name)
-    {:ok, genotype} = GenotypeFile.load(sut)
-
-    assert length(genotype) == 8
+    {:ok, store} = :ets.file2tab(String.to_atom(file_name))
+    assert :ets.lookup(store, :id) == [{:foo, :id, :bar}]
   end
 end

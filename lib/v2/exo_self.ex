@@ -4,6 +4,7 @@ defmodule NN.V2.ExoSelf do
   import Record
 
   alias NN.V2.{Cortex, Sensor, Actuator, Neuron}
+  alias NN.Genotype
 
   defmodule State do
     defstruct genotype: nil,
@@ -17,13 +18,9 @@ defmodule NN.V2.ExoSelf do
   end
 
   def init(handler) do
-    state = %State{
-      handler: handler
-    }
-
     initialize(self())
 
-    {:ok, state}
+    {:ok, handler}
   end
 
   def initialize(pid) do
@@ -34,39 +31,31 @@ defmodule NN.V2.ExoSelf do
     GenServer.cast(pid, {from, :backup, data})
   end
 
-  def handle_cast(:initialize, %{handler: handler} = state) do
-    {:ok, genotype} = GenServer.call(handler, :load)
-    store = :ets.new(:pid_store, [:set, :private])
-
-    state = %State{state |
-      genotype: genotype,
-      store: store,
-      cortex: map_neural_network(genotype, store),
-    }
-
-    {:noreply, state}
+  def handle_cast(:initialize, handler) do
+    {:noreply, initial_state(handler)}
   end
 
   def handle_cast({cortex, :backup, neuron_data}, %{cortex: cortex, handler: handler} = state) do
     %{genotype: g, store: s} = state
-    updated_genotype = update_genotype(g, s, neuron_data)
 
-    GenServer.cast(handler, {:save, updated_genotype})
+    :ok = update_genotype(handler, s, neuron_data)
+
+    Genotype.save(handler)
 
     {:noreply, state}
   end
 
   defp update_genotype(genotype, store, [{id, pid_weights} | neurons]) do
-    neuron = List.keyfind(genotype, id, 1)
+    {:ok, neuron} = Genotype.element(genotype, id)
     updated_input_weights = convert_pid_weights_to_id_weights(pid_weights, store, [])
     updated_neuron = neuron(neuron, input_weights: updated_input_weights)
-    updated_genotype = List.keyreplace(genotype, id, 1, updated_neuron)
-    update_genotype(updated_genotype, store, neurons)
+
+    Genotype.update(genotype, updated_neuron)
+
+    update_genotype(genotype, store, neurons)
   end
 
-  defp update_genotype(genotype, _store, []) do
-    genotype
-  end
+  defp update_genotype(_handler, _store, []), do: :ok
 
   defp convert_pid_weights_to_id_weights([{pid, weights} | inputs], store, acc) do
     id = convert_pid_to_id(pid, store)
@@ -81,8 +70,10 @@ defmodule NN.V2.ExoSelf do
     Enum.reverse([{:bias, bias} | acc])
   end
 
-  defp map_neural_network(genotype, store) do
-    [cortex | records] = genotype
+  defp initial_state(handler) do
+    store = :ets.new(:pid_store, [:set, :private])
+    {:ok, cortex} = Genotype.cortex(handler)
+
     sensor_ids = cortex(cortex, :sensor_ids)
     actuator_ids = cortex(cortex, :actuator_ids)
     neuron_ids = cortex(cortex, :neuron_ids)
@@ -95,7 +86,15 @@ defmodule NN.V2.ExoSelf do
     start_network_elements(exo_self, store, Neuron, neuron_ids)
 
     cortex_pid = :ets.lookup_element(store, cortex_id, 2)
-    link_network_elements(records, store, cortex_pid, exo_self)
+
+    {:ok, sensors} = Genotype.sensors(handler)
+    link_network_elements(sensors, store, cortex_pid, exo_self)
+
+    {:ok, neurons} = Genotype.neurons(handler)
+    link_network_elements(neurons, store, cortex_pid, exo_self)
+
+    {:ok, actuators} = Genotype.actuators(handler)
+    link_network_elements(actuators, store, cortex_pid, exo_self)
 
     link_cortex(
       exo_self,
@@ -107,7 +106,11 @@ defmodule NN.V2.ExoSelf do
       store
     )
 
-    cortex_pid
+    %State{
+      handler: handler,
+      store: store,
+      cortex: cortex_pid
+    }
   end
 
   defp start_network_elements(exo_self, store, type, [id | ids]) do

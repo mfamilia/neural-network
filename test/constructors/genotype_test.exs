@@ -23,7 +23,7 @@ defmodule NN.Constructors.GenotypeTest do
   test "create neuron layers", %{sut: sut} do
     Genotype.construct_genotype(sut)
 
-    assert_receive {:"$gen_cast", {:genotype, genotype}}
+    assert_receive {:"$gen_cast", {:save, genotype}}
     assert [_cortex, _sensor, _actuator | neurons] = genotype
     assert length(neurons) == 5
   end
@@ -31,7 +31,7 @@ defmodule NN.Constructors.GenotypeTest do
   test "create cortex", %{sut: sut} do
     Genotype.construct_genotype(sut)
 
-    assert_receive {:"$gen_cast", {:genotype, genotype}}
+    assert_receive {:"$gen_cast", {:save, genotype}}
     assert [cortex | _] = genotype
     assert {:cortex, id, sensors, actuators, neurons} = cortex
     assert {:cortex, _uuid} = id
@@ -47,7 +47,7 @@ defmodule NN.Constructors.GenotypeTest do
   test "create sensor", %{sut: sut} do
     Genotype.construct_genotype(sut)
 
-    assert_receive {:"$gen_cast", {:genotype, genotype}}
+    assert_receive {:"$gen_cast", {:save, genotype}}
     assert [_cortex, sensor | _] = genotype
     assert {:sensor, id, cortex_id, :random, 2, neurons} = sensor
     assert {:sensor, _uuid} = id
@@ -58,7 +58,7 @@ defmodule NN.Constructors.GenotypeTest do
   test "create actuator", %{sut: sut} do
     Genotype.construct_genotype(sut)
 
-    assert_receive {:"$gen_cast", {:genotype, genotype}}
+    assert_receive {:"$gen_cast", {:save, genotype}}
     assert [_cortex, _sensor, actuator | _] = genotype
     assert {:actuator, id, cortex_id, :print_results, 1, neurons} = actuator
     assert {:actuator, _uuid} = id

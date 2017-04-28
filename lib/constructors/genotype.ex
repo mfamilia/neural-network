@@ -68,6 +68,6 @@ defmodule NN.Constructors.Genotype do
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
     genotype = List.flatten([cortex, sensor, actuator | neurons])
 
-    GenServer.cast(handler, {:genotype, genotype})
+    GenServer.cast(handler, {:save, genotype})
   end
 end
