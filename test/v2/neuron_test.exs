@@ -21,7 +21,7 @@ defmodule NN.V2.NeuronTest do
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
 
-    Neuron.initialize(sut, exo_self, id, cortex, activation_function, inputs, outputs)
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, inputs, outputs)
 
     assert Neuron.backup(sut, cortex) == {sut, :id, inputs}
   end
@@ -34,7 +34,7 @@ defmodule NN.V2.NeuronTest do
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
 
-    Neuron.initialize(sut, exo_self, id, cortex, activation_function, inputs, outputs)
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, inputs, outputs)
 
     Neuron.forward(sut, exo_self, [1, 2])
 
@@ -50,7 +50,7 @@ defmodule NN.V2.NeuronTest do
     inputs = [{exo_self, weights} | [1]]
     outputs = [exo_self]
 
-    Neuron.initialize(sut, exo_self, id, cortex, activation_function, inputs, outputs)
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, inputs, outputs)
 
     Neuron.forward(sut, exo_self, [1, 2])
 
@@ -67,7 +67,7 @@ defmodule NN.V2.NeuronTest do
     inputs = [{exo_self, [1, 0]}, {neuron1, [1, 1]}, {neuron2, [0, 0]}]
     outputs = [exo_self]
 
-    Neuron.initialize(sut, exo_self, id, cortex, activation_function, inputs, outputs)
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, inputs, outputs)
 
     Neuron.forward(sut, neuron2, [1, 2])
     refute_receive {:"$gen_cast", {_sut, :forward, _signal}}

@@ -20,7 +20,7 @@ defmodule NN.V2.Actuator do
     GenServer.start_link(__MODULE__, state)
   end
 
-  def initialize(pid, exo_self, id, cortex, actuator_type, neurons) do
+  def configure(pid, exo_self, id, cortex, actuator_type, neurons) do
     GenServer.cast(pid, {exo_self, {id, cortex, actuator_type, neurons}})
   end
 

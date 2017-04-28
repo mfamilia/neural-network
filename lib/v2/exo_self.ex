@@ -17,20 +17,20 @@ defmodule NN.V2.ExoSelf do
   end
 
   def init(handler) do
-    initialize(self())
+    configure(self())
 
     {:ok, handler}
   end
 
-  def initialize(pid) do
-    GenServer.cast(pid, :initialize)
+  def configure(pid) do
+    GenServer.cast(pid, :configure)
   end
 
   def backup(pid, from, data) do
     GenServer.cast(pid, {from, :backup, data})
   end
 
-  def handle_cast(:initialize, handler) do
+  def handle_cast(:configure, handler) do
     {:noreply, initial_state(handler)}
   end
 
@@ -133,7 +133,7 @@ defmodule NN.V2.ExoSelf do
     vl = sensor(r, :vector_length)
     neurons = convert_ids_to_pids(sensor(r, :neuron_ids), store)
 
-    Sensor.initialize(pid,
+    Sensor.configure(pid,
       exo_self,
       id,
       cortex,
@@ -153,7 +153,7 @@ defmodule NN.V2.ExoSelf do
     type = actuator(r, :type)
     neurons = convert_ids_to_pids(sensor(r, :neuron_ids), store)
 
-    Actuator.initialize(pid,
+    Actuator.configure(pid,
       exo_self,
       id,
       cortex,
@@ -173,7 +173,7 @@ defmodule NN.V2.ExoSelf do
     inputs = convert_input_ids_to_pids(neuron(r, :input_weights), store)
     outputs = convert_ids_to_pids(neuron(r, :output_ids), store)
 
-    Neuron.initialize(pid,
+    Neuron.configure(pid,
       exo_self,
       id,
       cortex,
@@ -195,7 +195,7 @@ defmodule NN.V2.ExoSelf do
     neurons = convert_ids_to_pids(neuron_ids, store)
     cycles = 1000
 
-    Cortex.initialize(pid, exo_self, id, sensors, actuators, neurons, cycles)
+    Cortex.configure(pid, exo_self, id, sensors, actuators, neurons, cycles)
   end
 
   defp convert_input_ids_to_pids(inputs, store) do

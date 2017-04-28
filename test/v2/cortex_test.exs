@@ -20,7 +20,7 @@ defmodule NN.V2.CortexTest do
     neurons = []
     cycles = 10
 
-    Cortex.initialize(sut, exo_self, id, sensors, actuators, neurons, cycles)
+    Cortex.configure(sut, exo_self, id, sensors, actuators, neurons, cycles)
 
     assert_receive {:"$gen_cast", {^sut, :sync}}
   end
@@ -32,7 +32,7 @@ defmodule NN.V2.CortexTest do
     cycles = 10
     neurons = []
 
-    Cortex.initialize(sut, exo_self, id, sensors, actuators, neurons, cycles)
+    Cortex.configure(sut, exo_self, id, sensors, actuators, neurons, cycles)
     assert_receive {:"$gen_cast", {^sut, :sync}}
 
     Cortex.sync(sut, exo_self)
@@ -43,14 +43,14 @@ defmodule NN.V2.CortexTest do
     Process.flag :trap_exit, true
     id = :id
     {:ok, sensor} = Sensor.start_link(exo_self)
-    Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
+    Sensor.configure(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator1} = Actuator.start_link(exo_self)
     {:ok, actuator2} = Actuator.start_link(exo_self)
     {:ok, neuron} = Neuron.start_link(exo_self)
-    Neuron.initialize(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
+    Neuron.configure(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
     cycles = 3
 
-    Cortex.initialize(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron], cycles)
+    Cortex.configure(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron], cycles)
 
     for _ <- 1..3 do
       Cortex.sync(sut, actuator2)
@@ -67,13 +67,13 @@ defmodule NN.V2.CortexTest do
     Process.flag :trap_exit, true
     id = :id
     {:ok, sensor} = Sensor.start_link(exo_self)
-    Sensor.initialize(sensor, exo_self, id, sut, :random, 2, [])
+    Sensor.configure(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator} = Actuator.start_link(exo_self)
     {:ok, neuron} = Neuron.start_link(exo_self)
-    Neuron.initialize(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
+    Neuron.configure(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
     cycles = 3
 
-    Cortex.initialize(sut, exo_self, id, [sensor], [actuator], [neuron], cycles)
+    Cortex.configure(sut, exo_self, id, [sensor], [actuator], [neuron], cycles)
 
     for _ <- 1..3 do
       Cortex.sync(sut, actuator)

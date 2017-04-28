@@ -24,7 +24,7 @@ defmodule NN.V2.Neuron do
     GenServer.cast(pid, {from, :forward, signal})
   end
 
-  def initialize(pid, exo_self, id, cortex, activation_function, input_weights, outputs) do
+  def configure(pid, exo_self, id, cortex, activation_function, input_weights, outputs) do
     GenServer.cast(pid, {exo_self, {id, cortex, activation_function, input_weights, outputs}})
   end
 

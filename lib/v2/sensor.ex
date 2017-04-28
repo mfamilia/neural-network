@@ -19,7 +19,7 @@ defmodule NN.V2.Sensor do
     GenServer.cast(pid, {cortex, :sync})
   end
 
-  def initialize(pid, exo_self, id, cortex, sensor_type, vector_length, neurons) do
+  def configure(pid, exo_self, id, cortex, sensor_type, vector_length, neurons) do
     GenServer.cast(pid, {exo_self, {id, cortex, sensor_type, vector_length, neurons}})
   end
 

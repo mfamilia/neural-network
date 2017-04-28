@@ -20,7 +20,7 @@ defmodule NN.V2.ActuatorTest do
     actuator_type = :print_results
     neurons = [exo_self]
 
-    Actuator.initialize(sut, exo_self, id, cortex, actuator_type, neurons)
+    Actuator.configure(sut, exo_self, id, cortex, actuator_type, neurons)
 
     Actuator.forward(sut, exo_self, [1, 2])
 
@@ -35,7 +35,7 @@ defmodule NN.V2.ActuatorTest do
     {:ok, neuron2} = Neuron.start_link(exo_self)
     neurons = [neuron1, neuron2]
 
-    Actuator.initialize(sut, exo_self, id, cortex, actuator_type, neurons)
+    Actuator.configure(sut, exo_self, id, cortex, actuator_type, neurons)
 
     Actuator.forward(sut, neuron2, [1, 2])
     Actuator.forward(sut, neuron1, [3, 5])

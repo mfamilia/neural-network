@@ -20,7 +20,7 @@ defmodule NN.V2.SensorTest do
     targets = [exo_self]
     vector_length = 2
 
-    Sensor.initialize(sut, exo_self, id, cortex, sensor_type, vector_length, targets)
+    Sensor.configure(sut, exo_self, id, cortex, sensor_type, vector_length, targets)
 
     Sensor.sync(sut, cortex)
 
