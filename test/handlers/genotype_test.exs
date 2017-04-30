@@ -109,4 +109,21 @@ defmodule NN.Handlers.GenotypeTest do
 
     File.rm(file_name)
   end
+
+  test "print" do
+    file_name = "./test/fixtures/genotypes/simple.nn"
+    self = self()
+    io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
+    {:ok, sut} = Genotype.start_link(file_name, io)
+
+    assert Genotype.load(sut) == :ok
+
+    Genotype.print(sut)
+
+    Enum.each(1..8, fn(_) ->
+      assert_receive {:puts, _element}
+    end)
+
+    refute_receive {:puts, _element}
+  end
 end

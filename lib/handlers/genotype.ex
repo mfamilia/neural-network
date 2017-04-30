@@ -1,21 +1,21 @@
 defmodule NN.Handlers.Genotype do
   use GenServer
 
+  @io %{puts: &IO.puts/1}
+
   defmodule State do
     defstruct file_name: nil,
-      store: nil
+      store: nil,
+      io: nil
   end
 
-  def start_link(file_name) do
-    GenServer.start_link(__MODULE__, String.to_atom(file_name))
-  end
-
-  def init(file_name) do
+  def start_link(file_name, io \\ @io) do
     state = %State{
-      file_name: file_name
+      file_name: String.to_atom(file_name),
+      io: io
     }
 
-    {:ok, state}
+    GenServer.start_link(__MODULE__, state)
   end
 
   def load(pid) do
@@ -52,6 +52,10 @@ defmodule NN.Handlers.Genotype do
 
   def update(pid, element) do
     GenServer.cast(pid, {:update, element})
+  end
+
+  def print(pid) do
+    GenServer.cast(pid, :print)
   end
 
   def handle_call(:load, _from, %{file_name: f} = state) do
@@ -104,6 +108,21 @@ defmodule NN.Handlers.Genotype do
 
   def handle_cast({:update, element}, %{store: store} = state) do
     :ets.insert(store, element)
+
+    {:noreply, state}
+  end
+
+  def handle_cast(:print, %{store: s, io: io} = state) do
+    [
+      get_cortex(s),
+      get_elements(s, :sensor),
+      get_elements(s, :neuron),
+      get_elements(s, :actuator),
+    ]
+    |> List.flatten
+    |> Enum.each(fn(e) ->
+      io.puts.(inspect e)
+    end)
 
     {:noreply, state}
   end
