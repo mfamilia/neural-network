@@ -46,8 +46,8 @@ defmodule NN.Handlers.Genotype do
     GenServer.call(pid, {:element, id})
   end
 
-  def save(pid) do
-    GenServer.cast(pid, :save)
+  def save(pid, file_name \\ nil) do
+    GenServer.cast(pid, {:save, file_name})
   end
 
   def update(pid, element) do
@@ -56,6 +56,10 @@ defmodule NN.Handlers.Genotype do
 
   def print(pid) do
     GenServer.cast(pid, :print)
+  end
+
+  def rename(pid, new_file_name) do
+    GenServer.cast(pid, {:rename, new_file_name})
   end
 
   def handle_call(:load, _from, %{file_name: f} = state) do
@@ -100,8 +104,14 @@ defmodule NN.Handlers.Genotype do
     {:reply, {:ok, element}, state}
   end
 
-  def handle_cast(:save, %{file_name: f, store: s} = state) do
+  def handle_cast({:save, nil}, %{file_name: f, store: s} = state) do
     :ets.tab2file(s, f)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:save, f}, %{store: s} = state) do
+    :ets.tab2file(s, String.to_atom(f))
 
     {:noreply, state}
   end
@@ -123,6 +133,16 @@ defmodule NN.Handlers.Genotype do
     |> Enum.each(fn(e) ->
       io.puts.(inspect e)
     end)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:rename, new_name}, state) do
+    state = %{state |
+      file_name: String.to_atom(new_name)
+    }
+
+    save(self())
 
     {:noreply, state}
   end

@@ -110,6 +110,29 @@ defmodule NN.Handlers.GenotypeTest do
     File.rm(file_name)
   end
 
+  test "save to different file", %{file_name: file_name} do
+    {:ok, sut} = Genotype.start_link(file_name)
+    Genotype.new(sut)
+
+    id = {:neuron, {2, "666beba6-7f5b-49b0-8588-7f13299dc7fe"}}
+
+    Genotype.update(sut, {:foo, id})
+
+    new_file_name = "./test/genotype2.nn"
+    File.rm(new_file_name)
+    Genotype.save(sut, new_file_name)
+
+    Process.sleep(100)
+
+    {:ok, sut} = Genotype.start_link(new_file_name)
+    Genotype.load(sut)
+
+    assert {:ok, element} = Genotype.element(sut, id)
+    assert {:foo, ^id} = element
+
+    File.rm(new_file_name)
+  end
+
   test "print" do
     file_name = "./test/fixtures/genotypes/simple.nn"
     self = self()
@@ -125,5 +148,22 @@ defmodule NN.Handlers.GenotypeTest do
     end)
 
     refute_receive {:puts, _element}
+  end
+
+  test "rename" do
+    file_name = "./test/fixtures/genotypes/simple.nn"
+    self = self()
+    io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
+    {:ok, sut} = Genotype.start_link(file_name, io)
+
+    assert Genotype.load(sut) == :ok
+
+    new_file_name = "./test/fixtures/genotypes/rename.nn"
+    File.rm(new_file_name)
+    Genotype.rename(sut, new_file_name)
+
+    Process.sleep(100)
+
+    assert File.exists?(new_file_name)
   end
 end
