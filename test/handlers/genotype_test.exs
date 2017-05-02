@@ -161,6 +161,7 @@ defmodule NN.Handlers.GenotypeTest do
     new_file_name = "./test/fixtures/genotypes/rename.nn"
     File.rm(new_file_name)
     Genotype.rename(sut, new_file_name)
+    Genotype.save(sut)
 
     Process.sleep(100)
 

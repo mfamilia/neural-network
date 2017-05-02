@@ -142,8 +142,6 @@ defmodule NN.Handlers.Genotype do
       file_name: String.to_atom(new_name)
     }
 
-    save(self())
-
     {:noreply, state}
   end
 
