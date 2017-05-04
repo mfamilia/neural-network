@@ -4,13 +4,12 @@ defmodule NN.Constructors.GenotypeTest do
 
   setup do
     handler = self()
-    sensor_type = :random
-    actuator_type = :print_results
     hidden_layer_densities = [1, 3]
+    morphology = :xor
 
-    {:ok, pid} = Genotype.start_link(handler,
-      sensor_type,
-      actuator_type,
+    {:ok, pid} = Genotype.start_link(
+      handler,
+      morphology,
       hidden_layer_densities)
 
     [sut: pid]

@@ -2,26 +2,26 @@ defmodule NN.Constructors.Genotype do
   import NN.NetworkElementTypes
   import NN.Constructors.{
     Ids,
-    Sensor,
-    Actuator,
     Neuron,
     Cortex
   }
+
+  alias NN.Morphology
 
   use GenServer
 
   defmodule State do
     defstruct handler: nil,
-      sensor_type: nil,
-      actuator_type: nil,
+      sensor: nil,
+      actuator: nil,
       hidden_layer_densities: nil
   end
 
-  def start_link(handler, sensor_type, actuator_type, hidden_layer_densities) do
+  def start_link(handler, morphology, hidden_layer_densities) do
     state = %State{
       handler: handler,
-      sensor_type: sensor_type,
-      actuator_type: actuator_type,
+      sensor: Morphology.sensor(morphology),
+      actuator: Morphology.actuator(morphology),
       hidden_layer_densities: hidden_layer_densities
     }
 
@@ -40,12 +40,9 @@ defmodule NN.Constructors.Genotype do
 
   defp construct_genotype(state) do
     %{handler: handler,
-      sensor_type: st,
-      actuator_type: at,
+      sensor: s,
+      actuator: a,
       hidden_layer_densities: hld} = state
-
-    s = create_sensor(st)
-    a = create_actuator(at)
 
     output_vector_length = actuator(a, :vector_length)
     layer_densities = List.insert_at(hld, -1, output_vector_length)
