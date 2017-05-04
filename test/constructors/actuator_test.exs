@@ -8,7 +8,7 @@ defmodule NN.Constructors.ActuatorTest do
     result = Actuator.create_actuator(:print_results)
 
     assert Record.is_record(result, :actuator)
-    assert {:actuator, {:actuator, _uuid}, Tuple, :print_results, 1, List} = result
+    assert {:actuator, {:actuator, _uuid}, Tuple, :print_results, 1, List, Atom} = result
   end
 
   test "unsupported actuator type" do

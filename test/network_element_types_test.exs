@@ -5,31 +5,37 @@ defmodule NN.NetworkElementTypesTest do
   import NN.NetworkElementTypes
 
   test "create sensor records" do
-    s = sensor(id: {:sensor, 123.4},
-               cortex_id: {:cortex, 32.4},
-               type: :type,
-               vector_length: 3,
-               neuron_ids: [:id])
+    s = sensor(
+      id: {:sensor, 123.4},
+      cortex_id: {:cortex, 32.4},
+      type: :type,
+      vector_length: 3,
+      neuron_ids: [:id],
+      scape: :scape)
 
     assert sensor(s, :id) == {:sensor, 123.4}
     assert sensor(s, :cortex_id) == {:cortex, 32.4}
     assert sensor(s, :type) == :type
     assert sensor(s, :vector_length) == 3
     assert sensor(s, :neuron_ids) == [:id]
+    assert sensor(s, :scape) == :scape
   end
 
   test "create actuator records" do
-    s = actuator(id: {:actuator, 123.4},
-                 cortex_id: {:cortex, 32.4},
-                 type: :type,
-                 vector_length: 3,
-                 neuron_ids: [:id])
+    s = actuator(
+      id: {:actuator, 123.4},
+      cortex_id: {:cortex, 32.4},
+      type: :type,
+      vector_length: 3,
+      neuron_ids: [:id],
+      scape: :scape)
 
     assert actuator(s, :id) == {:actuator, 123.4}
     assert actuator(s, :cortex_id) == {:cortex, 32.4}
     assert actuator(s, :type) == :type
     assert actuator(s, :vector_length) == 3
     assert actuator(s, :neuron_ids) == [:id]
+    assert actuator(s, :scape) == :scape
   end
 
   test "create neuron records" do
