@@ -21,7 +21,7 @@ defmodule NN.Constructors.GenotypeTest do
   end
 
   test "create elements", %{sut: sut} do
-    Genotype.construct_genotype(sut)
+    Genotype.construct(sut)
 
     Enum.each(1..8, fn(_) ->
       assert_receive {:"$gen_cast", {:update, _element}}

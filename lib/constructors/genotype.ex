@@ -28,17 +28,17 @@ defmodule NN.Constructors.Genotype do
     GenServer.start_link(__MODULE__, state)
   end
 
-  def construct_genotype(pid) do
-    GenServer.cast(pid, :construct_genotype)
+  def construct(pid) do
+    GenServer.cast(pid, :construct)
   end
 
-  def handle_cast(:construct_genotype, state) do
-    construct(state)
+  def handle_cast(:construct, state) do
+    construct_genotype(state)
 
     {:noreply, state}
   end
 
-  def construct(state) do
+  defp construct_genotype(state) do
     %{handler: handler,
       sensor_type: st,
       actuator_type: at,
