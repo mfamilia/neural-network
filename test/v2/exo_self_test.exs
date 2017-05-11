@@ -40,7 +40,7 @@ defmodule NN.V2.ExoSelfTest do
         GenServer.reply(from, {:ok, element})
       end)
 
-      assert_receive {:"$gen_cast", :save}
+      assert_receive {:"$gen_cast", {:save, nil}}
     end
   end
 end
