@@ -1,6 +1,6 @@
-defmodule NN.V2.NeuronTest do
+defmodule NN.V3.NeuronTest do
   use ExUnit.Case, async: false
-  alias NN.V2.Neuron
+  alias NN.V3.Neuron
 
   setup do
     exo_self = self()
@@ -13,17 +13,50 @@ defmodule NN.V2.NeuronTest do
     assert Process.alive?(sut)
   end
 
-  test "backup input weights", %{sut: sut, exo_self: exo_self} do
+  test "get backup input weights", %{sut: sut, exo_self: exo_self} do
     id = :id
     cortex = exo_self
     activation_function = :tanh
     weights = [0 , 1]
-    inputs = [{exo_self, weights}]
+    input_weights = [{exo_self, weights}]
     outputs = [exo_self]
 
-    Neuron.configure(sut, exo_self, id, cortex, activation_function, inputs, outputs)
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, input_weights, outputs)
 
-    assert Neuron.backup(sut, cortex) == {sut, :id, inputs}
+    assert Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
+  end
+
+  test "backup and restore input weights", %{sut: sut, exo_self: exo_self} do
+    id = :id
+    cortex = exo_self
+    activation_function = :tanh
+    weights = [0 , 1]
+    input_weights = [{exo_self, weights}]
+    outputs = [exo_self]
+
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, input_weights, outputs)
+
+    Neuron.backup(sut, cortex)
+    Neuron.perturb(sut, cortex)
+
+    refute Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
+
+    Neuron.restore(sut, cortex)
+    assert Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
+  end
+
+  test "perturb input weights", %{sut: sut, exo_self: exo_self} do
+    id = :id
+    cortex = exo_self
+    activation_function = :tanh
+    weights = [0 , 1]
+    input_weights = [{exo_self, weights}]
+    outputs = [exo_self]
+
+    Neuron.configure(sut, exo_self, id, cortex, activation_function, input_weights, outputs)
+    Neuron.perturb(sut, cortex)
+
+    refute Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
   end
 
   test "forwards signal to output", %{sut: sut, exo_self: exo_self} do
