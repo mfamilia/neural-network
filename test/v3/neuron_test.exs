@@ -30,7 +30,7 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0.032 , 0.453]
     input_weights = [{exo_self, weights}]
     outputs = [exo_self]
 
@@ -38,10 +38,8 @@ defmodule NN.V3.NeuronTest do
 
     Neuron.backup(sut, cortex)
     Neuron.perturb(sut, cortex)
-
-    refute Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
-
     Neuron.restore(sut, cortex)
+
     assert Neuron.get_backup(sut, cortex) == {sut, :id, input_weights}
   end
 
