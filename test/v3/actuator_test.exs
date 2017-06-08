@@ -30,7 +30,7 @@ defmodule NN.V3.ActuatorTest do
     Actuator.forward(sut, neuron2, List.first(output))
     Actuator.forward(sut, neuron1, List.last(output))
 
-    assert_receive {:"$gen_call", from, {^sut, :action, ^output}}
+    assert_receive {:"$gen_call", from, {^exo_self, :action, ^output}}
 
     fitness = 80
     halt_flag = 1
