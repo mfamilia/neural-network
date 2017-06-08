@@ -46,6 +46,7 @@ defmodule NN.V3.Actuator do
 
   def handle_cast({neuron, :forward, signal}, %{neurons: [neuron]} = state) do
     %{
+      exo_self: exo_self,
       cortex: c,
       memory: neurons,
       signals: signals,
@@ -54,7 +55,7 @@ defmodule NN.V3.Actuator do
       scape: scape
     } = state
 
-    {fitness, halt_flag} = apply(__MODULE__, type, [[signal | signals], scape, io])
+    {fitness, halt_flag} = apply(__MODULE__, type, [[signal | signals], scape, exo_self])
 
     trigger_cortex(c, fitness, halt_flag)
 
@@ -79,7 +80,7 @@ defmodule NN.V3.Actuator do
     Cortex.sync(cortex, self(), fitness, halt_flag)
   end
 
-  def send_output(output, scape, io) do
-    GenServer.call(scape, {self(), :action, output})
+  def send_output(output, scape, exo_self) do
+    GenServer.call(scape, {exo_self, :action, output})
   end
 end
