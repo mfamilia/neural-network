@@ -8,7 +8,7 @@ defmodule NN.V2.ExoSelfTest do
   test "backup" do
     with_mock IO, [puts: fn(_) -> :ok end] do
       genotype = self()
-      file_name = "./test/fixtures/genotypes/simple.nn"
+      file_name = "./test/fixtures/genotypes/v2.nn"
 
       {:ok, source} = Genotype.start_link(file_name)
       :ok = Genotype.load(source)

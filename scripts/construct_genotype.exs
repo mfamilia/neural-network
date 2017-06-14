@@ -6,6 +6,6 @@ file_name = "./test/fixtures/genotypes/simple.nn"
 
 Handler.new(h)
 
-{:ok, c} = Genotype.start_link(h, :random, :print_results, [1, 3])
+{:ok, c} = Genotype.start_link(h, :print, [1, 3])
 Genotype.construct(c)
 

@@ -6,8 +6,7 @@ defmodule NN.Scapes.Xor do
   defmodule State do
     defstruct exo_self: nil,
       xor: nil,
-      total_error: nil,
-      correct_output: nil
+      total_error: nil
   end
 
   def start_link(exo_self) do

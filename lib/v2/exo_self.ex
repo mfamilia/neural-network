@@ -151,7 +151,7 @@ defmodule NN.V2.ExoSelf do
     id = actuator(r, :id)
     pid = convert_id_to_pid(id, store)
     type = actuator(r, :type)
-    neurons = convert_ids_to_pids(sensor(r, :neuron_ids), store)
+    neurons = convert_ids_to_pids(actuator(r, :neuron_ids), store)
 
     Actuator.configure(pid,
       exo_self,
