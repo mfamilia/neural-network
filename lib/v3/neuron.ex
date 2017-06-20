@@ -51,6 +51,8 @@ defmodule NN.V3.Neuron do
   end
 
   def handle_cast({exo_self, {id, cortex, activation_function, input_weights, outputs}}, exo_self) do
+    Random.seed()
+
     state = %State{
       exo_self: exo_self,
       id: id,
@@ -139,7 +141,10 @@ defmodule NN.V3.Neuron do
   end
 
   defp perturb_input_weights(input_weights) do
-    total_weights = Enum.reduce(input_weights, 0, fn(x, acc) ->
+    total_weights = Enum.filter(input_weights, fn(element) ->
+      match?({_, _weights}, element)
+    end)
+    |> Enum.reduce(0, fn(x, acc) ->
       {_, weights} = x
       acc + length(weights)
     end)
@@ -173,7 +178,7 @@ defmodule NN.V3.Neuron do
   end
 
   defp perturb_weights(probability, [w | weights], acc) do
-    updated_bias = case Random.uniform < probability do
+    updated_weight = case Random.uniform < probability do
       true ->
         value = (Random.uniform - 0.5) * @delta_multiplier + w
 
@@ -182,7 +187,7 @@ defmodule NN.V3.Neuron do
         w
     end
 
-    perturb_weights(probability, weights, [updated_bias | acc])
+    perturb_weights(probability, weights, [updated_weight | acc])
   end
 
   defp perturb_weights(_probability, [], acc) do

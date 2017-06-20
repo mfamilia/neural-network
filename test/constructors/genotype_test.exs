@@ -26,6 +26,6 @@ defmodule NN.Constructors.GenotypeTest do
       assert_receive {:"$gen_cast", {:update, _element}}
     end)
 
-    assert_receive {:"$gen_cast", :save}
+    assert_receive {:"$gen_cast", {:save, nil}}
   end
 end

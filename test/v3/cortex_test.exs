@@ -123,7 +123,7 @@ defmodule NN.V3.CortexTest do
 
     Cortex.configure(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron])
 
-    assert_receive {:"$gen_call", from, {^sensor, :sense}}
+    assert_receive {:"$gen_call", from, {^exo_self, :sense}}
     GenServer.reply(from, {:percept, []})
 
     GenServer.stop(sut)

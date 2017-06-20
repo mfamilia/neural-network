@@ -33,6 +33,8 @@ defmodule NN.Constructors.Genotype do
   end
 
   def handle_cast(:construct, state) do
+    Random.seed()
+
     construct_genotype(state)
 
     {:noreply, state}
@@ -68,6 +70,6 @@ defmodule NN.Constructors.Genotype do
         GenServer.cast(handler, {:update, e})
       end)
 
-    GenServer.cast(handler, :save)
+    GenServer.cast(handler, {:save, nil})
   end
 end

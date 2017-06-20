@@ -106,6 +106,7 @@ defmodule NN.V3.Cortex do
     trigger_sensors(sensors)
 
     state = %{state |
+      fitness: 0,
       halts: 0,
       actuators: memory,
       start_time: now(),

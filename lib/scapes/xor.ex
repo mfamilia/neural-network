@@ -73,6 +73,6 @@ defmodule NN.Scapes.Xor do
   end
 
   defp total_fitness(total_error) do
-    1/(:math.sqrt(total_error)+0.00001)
+    1 / (:math.sqrt(total_error) + 0.00001)
   end
 end

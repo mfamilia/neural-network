@@ -87,7 +87,7 @@ defmodule NN.Handlers.Genotype do
   end
 
   def handle_call(:neurons, _from, %{store: store} = state) do
-    {:reply, {:ok, get_elements(store, :neuron)}, state}
+    {:reply, {:ok, get_neurons(store)}, state}
   end
 
   def handle_call(:sensors, _from, %{store: store} = state) do
@@ -126,7 +126,7 @@ defmodule NN.Handlers.Genotype do
     [
       get_cortex(s),
       get_elements(s, :sensor),
-      get_elements(s, :neuron),
+      get_neurons(s),
       get_elements(s, :actuator),
     ]
     |> List.flatten
@@ -151,6 +151,10 @@ defmodule NN.Handlers.Genotype do
   end
 
   defp get_elements(store, key) do
-   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_"})
+   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_", :"_"})
+  end
+
+  defp get_neurons(store) do
+   :ets.match_object(store, {:neuron, :"_", :"_", :"_", :"_", :"_"})
   end
 end

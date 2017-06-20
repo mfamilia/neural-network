@@ -51,13 +51,18 @@ defmodule NN.V3.Sensor do
   end
 
   defp sensory_vector(state) do
-    %{vector_length: vl, scape: scape, sensor_type: type} = state
+    %{
+      vector_length: vl,
+      scape: scape,
+      sensor_type: type,
+      exo_self: exo_self
+    } = state
 
-    apply(__MODULE__, type, [vl, scape])
+    apply(__MODULE__, type, [vl, scape, exo_self])
   end
 
-  def get_input(vl, scape) do
-    {:percept, data} = GenServer.call(scape, {self(), :sense})
+  def get_input(vl, scape, exo_self) do
+    {:percept, data} = GenServer.call(scape, {exo_self, :sense})
 
     data
   end

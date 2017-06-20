@@ -22,7 +22,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "get cortex" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
@@ -31,7 +31,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "get neurons" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
@@ -43,7 +43,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "get sensors" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
@@ -55,7 +55,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "get actuators" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
@@ -67,18 +67,18 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "get element" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
-    id = {:neuron, {2, "666beba6-7f5b-49b0-8588-7f13299dc7fe"}}
+    id = {:neuron, {2, "74a39191-eb74-4f39-8a4e-aba847f3d6c4"}}
 
     assert {:ok, element} = Genotype.element(sut, id)
     assert {:neuron, ^id, _, _, _, _} = element
   end
 
   test "update element" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     {:ok, sut} = Genotype.start_link(file_name)
 
     assert Genotype.load(sut) == :ok
@@ -134,7 +134,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "print" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     self = self()
     io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
     {:ok, sut} = Genotype.start_link(file_name, io)
@@ -151,7 +151,7 @@ defmodule NN.Handlers.GenotypeTest do
   end
 
   test "rename" do
-    file_name = "./test/fixtures/genotypes/simple.nn"
+    file_name = "./test/fixtures/genotypes/v2.nn"
     self = self()
     io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
     {:ok, sut} = Genotype.start_link(file_name, io)

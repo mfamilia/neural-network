@@ -4,8 +4,7 @@ defmodule NN.V3.ActuatorTest do
 
   setup do
     exo_self = self()
-    io = %{puts: fn(msg) -> send(exo_self, {:puts, msg}) end}
-    {:ok, sut} = Actuator.start_link(exo_self, io)
+    {:ok, sut} = Actuator.start_link(exo_self)
 
     [sut: sut, exo_self: exo_self]
   end
@@ -25,16 +24,16 @@ defmodule NN.V3.ActuatorTest do
 
     Actuator.configure(sut, exo_self, id, cortex, scape, actuator_type, neurons)
 
-    output = [[1, 2], [3, 5]]
+    output = [1, 2]
 
-    Actuator.forward(sut, neuron2, List.first(output))
-    Actuator.forward(sut, neuron1, List.last(output))
+    Actuator.forward(sut, neuron2, [List.first(output)])
+    Actuator.forward(sut, neuron1, [List.last(output)])
 
-    assert_receive {:"$gen_call", from, {^exo_self, :action, ^output}}
+    assert_receive {:"$gen_call", from, {^exo_self, :action, [2, 1]}}
 
     fitness = 80
     halt_flag = 1
-    GenServer.reply(from, {fitness, halt_flag})
+    GenServer.reply(from, {:fitness, fitness, halt_flag})
 
     assert_receive {:"$gen_cast", {^sut, :sync, ^fitness, ^halt_flag}}
   end

@@ -2,8 +2,6 @@ defmodule NN.V3.Actuator do
   use GenServer
   alias NN.V3.Cortex
 
-  @io %{puts: &IO.puts/1}
-
   defmodule State do
     defstruct exo_self: nil,
       id: nil,
@@ -12,12 +10,11 @@ defmodule NN.V3.Actuator do
       neurons: nil,
       memory: nil,
       signals: nil,
-      io: nil,
       scape: nil
   end
 
-  def start_link(exo_self, io \\ @io) do
-    state = %State{exo_self: exo_self, io: io}
+  def start_link(exo_self) do
+    state = %State{exo_self: exo_self}
 
     GenServer.start_link(__MODULE__, state)
   end
@@ -51,11 +48,10 @@ defmodule NN.V3.Actuator do
       memory: neurons,
       signals: signals,
       actuator_type: type,
-      io: io,
       scape: scape
     } = state
 
-    {fitness, halt_flag} = apply(__MODULE__, type, [[signal | signals], scape, exo_self])
+    {:fitness, fitness, halt_flag} = apply(__MODULE__, type, [signal ++ signals, scape, exo_self])
 
     trigger_cortex(c, fitness, halt_flag)
 
@@ -65,7 +61,7 @@ defmodule NN.V3.Actuator do
   end
 
   def handle_cast({neuron, :forward, signal}, %{neurons: [neuron | neurons], signals: signals} = state) do
-    state = %{state | neurons: neurons, signals: [signal | signals]}
+    state = %{state | neurons: neurons, signals: signal ++ signals}
 
     {:noreply, state}
   end
@@ -81,6 +77,6 @@ defmodule NN.V3.Actuator do
   end
 
   def send_output(output, scape, exo_self) do
-    GenServer.call(scape, {exo_self, :action, output})
+    GenServer.call(scape, {exo_self, :action, Enum.reverse(output)})
   end
 end
