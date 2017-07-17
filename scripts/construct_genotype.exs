@@ -9,3 +9,8 @@ Handler.new(h)
 {:ok, c} = Genotype.start_link(h, :print, [1, 3])
 Genotype.construct(c)
 
+Process.sleep(500)
+
+Handler.load(h)
+Handler.print(h)
+

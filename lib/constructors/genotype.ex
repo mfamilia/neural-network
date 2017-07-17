@@ -29,15 +29,15 @@ defmodule NN.Constructors.Genotype do
   end
 
   def construct(pid) do
-    GenServer.cast(pid, :construct)
+    GenServer.call(pid, :construct)
   end
 
-  def handle_cast(:construct, state) do
+  def handle_call(:construct, _from, state) do
     Random.seed()
 
     construct_genotype(state)
 
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
   defp construct_genotype(state) do
@@ -70,6 +70,6 @@ defmodule NN.Constructors.Genotype do
         GenServer.cast(handler, {:update, e})
       end)
 
-    GenServer.cast(handler, {:save, nil})
+    GenServer.call(handler, {:save, nil})
   end
 end

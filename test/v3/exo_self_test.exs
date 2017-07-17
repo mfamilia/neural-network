@@ -41,6 +41,10 @@ defmodule NN.V3.ExoSelfTest do
       GenServer.reply(from, {:ok, element})
     end)
 
-    assert_receive {:"$gen_cast", {:save, nil}}
+    Enum.each(1..3, fn(_) ->
+      assert_receive {:"$gen_cast", {:update, _element}}
+    end)
+
+    assert_receive {:"$gen_call", _from, {:save, nil}}
   end
 end

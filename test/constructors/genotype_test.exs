@@ -2,8 +2,28 @@ defmodule NN.Constructors.GenotypeTest do
   use ExUnit.Case
   alias NN.Constructors.Genotype
 
+  defmodule Handler do
+    use GenServer
+
+    def start_link(listener) do
+      GenServer.start_link(Handler, listener)
+    end
+
+    def handle_cast(msg, listener) do
+      GenServer.cast(listener, msg)
+
+      {:noreply, listener}
+    end
+
+    def handle_call(msg, _from, listener) do
+      GenServer.cast(listener, msg)
+
+      {:reply, nil, listener}
+    end
+  end
+
   setup do
-    handler = self()
+    {:ok, handler} = Handler.start_link(self())
     hidden_layer_densities = [1, 3]
     morphology = :xor
 

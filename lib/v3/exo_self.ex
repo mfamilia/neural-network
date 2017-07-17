@@ -107,6 +107,20 @@ defmodule NN.V3.ExoSelf do
           TotCycles: #{total_cycles}\n
           TimeAcc:#{total_time}\n"
         )
+
+        case Process.whereis(:trainer) do
+          nil ->
+            :ok
+          pid ->
+            NN.Trainer.training_complete(
+              pid,
+              exo_self,
+              highest_fitness,
+              evaluations,
+              total_cycles,
+              total_time
+            )
+        end
       false ->
         total_neurons = length(neurons)
         probability = 1 / :math.sqrt(total_neurons)

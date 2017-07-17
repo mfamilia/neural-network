@@ -9,13 +9,18 @@ defmodule NN.Handlers.Genotype do
       io: nil
   end
 
-  def start_link(file_name, io \\ @io) do
+  def start_link(file_name, io \\ @io)
+  when is_atom(file_name) do
     state = %State{
-      file_name: String.to_atom(file_name),
+      file_name: file_name,
       io: io
     }
 
     GenServer.start_link(__MODULE__, state)
+  end
+
+  def start_link(file_name, io) do
+    start_link(String.to_atom(file_name), io)
   end
 
   def load(pid) do
@@ -47,7 +52,7 @@ defmodule NN.Handlers.Genotype do
   end
 
   def save(pid, file_name \\ nil) do
-    GenServer.cast(pid, {:save, file_name})
+    GenServer.call(pid, {:save, file_name})
   end
 
   def update(pid, element) do
@@ -63,6 +68,7 @@ defmodule NN.Handlers.Genotype do
   end
 
   def handle_call(:load, _from, %{file_name: f} = state) do
+    IO.puts inspect f
     {:ok, store} = :ets.file2tab(f)
 
     state = %{state |
@@ -104,16 +110,21 @@ defmodule NN.Handlers.Genotype do
     {:reply, {:ok, element}, state}
   end
 
-  def handle_cast({:save, nil}, %{file_name: f, store: s} = state) do
+  def handle_call({:save, nil}, _from, %{file_name: f, store: s} = state) do
     :ets.tab2file(s, f)
 
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
-  def handle_cast({:save, f}, %{store: s} = state) do
-    :ets.tab2file(s, String.to_atom(f))
+  def handle_call({:save, f}, _from, %{store: s} = state)
+  when is_atom(f) do
+    :ets.tab2file(s, f)
 
-    {:noreply, state}
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:save, f}, from, %{store: s} = state) do
+    handle_call({:save, String.to_atom(f)}, from, state)
   end
 
   def handle_cast({:update, element}, %{store: store} = state) do
