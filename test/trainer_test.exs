@@ -3,8 +3,6 @@ defmodule NN.TrainerTest do
   alias NN.Trainer
 
   setup do
-    self = self()
-    io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
     morphology = :xor
     hidden_layer_densities = [2]
     max_attempts = :infinity
@@ -14,6 +12,7 @@ defmodule NN.TrainerTest do
     {:ok, sut} = Trainer.start_link(
       morphology,
       hidden_layer_densities,
+      self(),
       max_attempts,
       eval_limit,
       fitness_target)
@@ -21,7 +20,11 @@ defmodule NN.TrainerTest do
     [sut: sut]
   end
 
-  test "configure", %{sut: sut} do
-    Process.sleep(50)
+  test "training complete", %{sut: sut} do
+    assert_receive {:"$gen_cast", {:training_complete, ^sut, :xor, best_fitness, evals, time}}, 5_000
+
+    assert best_fitness > 188
+    assert evals > 100
+    assert time > 1000
   end
 end

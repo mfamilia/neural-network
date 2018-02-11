@@ -1,13 +1,12 @@
 defmodule NN.Trainer do
   use GenServer
   alias NN.Constructors.Genotype, as: Genotype
-  alias NN.Handlers.Genotype, as: Handler
+  alias NN.Handlers.Genotype, as: GenotypeHandler
   alias NN.V3.ExoSelf
 
   @max_attempts 5
   @eval_limit :infinity
   @fitness_target :infinity
-  @io %{puts: &IO.puts/1}
 
   defmodule State do
     defstruct morphology: nil,
@@ -21,17 +20,17 @@ defmodule NN.Trainer do
       exo_self: nil,
       cycles: nil,
       time: nil,
-      handler: nil,
-      io: nil
+      genotype_handler: nil,
+      result_handler: nil
   end
 
   def start_link(
     morphology,
     hidden_layer_densities,
+    result_handler,
     max_attempts \\ @max_attempts,
     eval_limit \\ @eval_limit,
-    fitness_target \\ @fitness_target,
-    io \\ @io) do
+    fitness_target \\ @fitness_target) do
 
     state = %State{
       morphology: morphology,
@@ -44,8 +43,8 @@ defmodule NN.Trainer do
       best_fitness: 0,
       cycles: 0,
       time: 0,
-      handler: nil,
-      io: io
+      genotype_handler: nil,
+      result_handler: result_handler
     }
 
     GenServer.start_link(__MODULE__, state)
@@ -70,21 +69,20 @@ defmodule NN.Trainer do
     %{
       morphology: m,
       trainee_name: name,
-      hidden_layer_densities: hld,
-      io: io
+      hidden_layer_densities: hld
     } = state
 
-    {:ok, h} = Handler.start_link(name, io)
-    :ok = Handler.new(h)
+    {:ok, h} = GenotypeHandler.start_link(name)
+    :ok = GenotypeHandler.new(h)
     {:ok, c} = Genotype.start_link(h, m, hld)
 
     :ok = Genotype.construct(c)
 
-    Handler.load(h)
+    GenotypeHandler.load(h)
 
     {:ok, exo_self} = ExoSelf.start_link(h)
 
-    state = %{state | exo_self: exo_self, handler: h}
+    state = %{state | exo_self: exo_self, genotype_handler: h}
 
     {:noreply, state}
   end
@@ -101,9 +99,14 @@ defmodule NN.Trainer do
       evals: {e, eval_limit},
       best_fitness: bf,
       fitness_target: ft,
-      exo_self: exo_self
+      exo_self: exo_self,
+      morphology: m,
+      time: time,
+      result_handler: h
     } = state)
     when (a >= max_attempts) or (e >= eval_limit) or (bf >= ft) do
+
+    GenServer.cast(h, {:training_complete, self(), m, bf, e, time})
 
     {:stop, :normal, state}
   end
@@ -124,7 +127,7 @@ defmodule NN.Trainer do
       cycles: c,
       time: t,
       best_fitness: bf,
-      handler: h,
+      genotype_handler: h,
       best_trainee_name: btn,
       attempts: {a, max_attempts}
     } = state
@@ -137,7 +140,7 @@ defmodule NN.Trainer do
 
     state = case fitness > bf do
       true ->
-        Handler.save(h, btn)
+        GenotypeHandler.save(h, btn)
 
         %{state |
           attempts: {1, max_attempts},
@@ -154,22 +157,4 @@ defmodule NN.Trainer do
 
     {:noreply, state}
   end
-
-  def terminate(:normal, state) do
-    %{
-      io: io,
-      handler: h,
-      morphology: m,
-      best_fitness: bf,
-      evals: {e, _},
-      time: time
-    } = state
-
-    Handler.print(h)
-
-    io.puts.("Morphology: #{m} | Best Fitness: #{bf} | Evaluations: #{e} | Time; #{time}")
-
-    {:ok, state}
-  end
 end
-

@@ -7,7 +7,6 @@ defmodule NN.V3.ExoSelf do
   alias NN.Handlers.Genotype
   alias NN.Scape
 
-  @io %{puts: &IO.puts/1}
   @max_attempts 50
 
   defmodule State do
@@ -22,28 +21,27 @@ defmodule NN.V3.ExoSelf do
       total_time: nil,
       sensors: nil,
       neurons: nil,
-      actuators: nil,
-      io: nil
+      actuators: nil
   end
 
-  def start_link(handler, io \\ @io) do
-    GenServer.start_link(__MODULE__, {handler, io})
+  def start_link(handler) do
+    GenServer.start_link(__MODULE__, handler)
   end
 
-  def init({handler, io}) do
+  def init(handler) do
     configure(self())
 
-    {:ok, {handler, io}}
+    {:ok, handler}
   end
 
   def configure(pid) do
     GenServer.cast(pid, :configure)
   end
 
-  def handle_cast(:configure, {handler, io}) do
+  def handle_cast(:configure, handler) do
     Random.seed()
 
-    {:noreply, initial_state({handler, io})}
+    {:noreply, initial_state(handler)}
   end
 
   def handle_cast({cortex, :backup, neuron_data}, %{cortex: cortex} = state) do
@@ -89,7 +87,6 @@ defmodule NN.V3.ExoSelf do
       total_time: tt,
       handler: genotype,
       store: store,
-      io: io,
       evaluations: evaluations
     } = state
 
@@ -99,14 +96,6 @@ defmodule NN.V3.ExoSelf do
     case attempt >= @max_attempts do
       true ->
         backup_genotype(genotype, neurons, exo_self, store)
-
-        io.puts.("Cortex: #{inspect cortex} finished training.
-          Genotype has been backed up.\n
-          Fitness: #{highest_fitness}\n
-          TotalEvaluations: #{evaluations}\n
-          TotCycles: #{total_cycles}\n
-          TimeAcc:#{total_time}\n"
-        )
 
         case Process.whereis(:trainer) do
           nil ->
@@ -160,7 +149,7 @@ defmodule NN.V3.ExoSelf do
     Genotype.save(genotype)
   end
 
-  defp update_genotype(handler, store, [{pid, id, pid_weights} | neurons]) do
+  defp update_genotype(handler, store, [{_pid, id, pid_weights} | neurons]) do
     {:ok, neuron} = Genotype.element(handler, id)
     updated_input_weights = convert_pid_weights_to_id_weights(pid_weights, store, [])
     updated_neuron = neuron(neuron, input_weights: updated_input_weights)
@@ -185,7 +174,7 @@ defmodule NN.V3.ExoSelf do
     Enum.reverse([{:bias, bias} | acc])
   end
 
-  defp initial_state({handler, io}) do
+  defp initial_state(handler) do
     store = :ets.new(:pid_store, [:set, :private])
     {:ok, cortex} = Genotype.cortex(handler)
 
@@ -235,8 +224,7 @@ defmodule NN.V3.ExoSelf do
       attempt: 1,
       sensors: sensors,
       neurons: neurons,
-      actuators: actuators,
-      io: io
+      actuators: actuators
     }
   end
 

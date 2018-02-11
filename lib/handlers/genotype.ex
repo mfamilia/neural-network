@@ -10,6 +10,8 @@ defmodule NN.Handlers.Genotype do
   end
 
   def start_link(file_name, io \\ @io)
+
+  def start_link(file_name, io)
   when is_atom(file_name) do
     state = %State{
       file_name: file_name,
@@ -21,6 +23,10 @@ defmodule NN.Handlers.Genotype do
 
   def start_link(file_name, io) do
     start_link(String.to_atom(file_name), io)
+  end
+
+  def init(state) do
+    {:ok, state}
   end
 
   def load(pid) do
@@ -68,7 +74,6 @@ defmodule NN.Handlers.Genotype do
   end
 
   def handle_call(:load, _from, %{file_name: f} = state) do
-    IO.puts inspect f
     {:ok, store} = :ets.file2tab(f)
 
     state = %{state |
@@ -123,7 +128,7 @@ defmodule NN.Handlers.Genotype do
     {:reply, :ok, state}
   end
 
-  def handle_call({:save, f}, from, %{store: s} = state) do
+  def handle_call({:save, f}, from, state) do
     handle_call({:save, String.to_atom(f)}, from, state)
   end
 

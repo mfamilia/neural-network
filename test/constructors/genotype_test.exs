@@ -9,6 +9,10 @@ defmodule NN.Constructors.GenotypeTest do
       GenServer.start_link(Handler, listener)
     end
 
+    def init(state) do
+      {:ok, state}
+    end
+
     def handle_cast(msg, listener) do
       GenServer.cast(listener, msg)
 

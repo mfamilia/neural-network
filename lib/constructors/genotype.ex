@@ -28,6 +28,10 @@ defmodule NN.Constructors.Genotype do
     GenServer.start_link(__MODULE__, state)
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def construct(pid) do
     GenServer.call(pid, :construct)
   end
