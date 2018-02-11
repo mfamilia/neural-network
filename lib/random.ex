@@ -1,11 +1,11 @@
 defmodule Random do
   def seed do
-    {x, y, z} = :erlang.now()
+    {x, y, z} = :erlang.timestamp()
 
-    :random.seed(x, y, z)
+    :rand.seed(:exs1024s, {x, y, z})
   end
 
   def uniform do
-    :random.uniform
+    :rand.uniform
   end
 end

@@ -19,6 +19,10 @@ defmodule NN.V3.Neuron do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def get_backup(pid, exo_self) do
     GenServer.call(pid, {exo_self, :get_backup})
   end

@@ -5,6 +5,10 @@ defmodule NN.V1.Env do
     GenServer.start_link(__MODULE__, [])
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def sense(pid) do
     GenServer.call(pid, :sense)
   end

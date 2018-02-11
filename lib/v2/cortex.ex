@@ -16,6 +16,10 @@ defmodule NN.V2.Cortex do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def configure(pid, exo_self, id, sensors, actuators, neurons, cycles) do
     GenServer.cast(pid, {exo_self, {id, sensors, actuators, neurons}, cycles})
   end

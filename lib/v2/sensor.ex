@@ -15,6 +15,10 @@ defmodule NN.V2.Sensor do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def sync(pid, cortex) do
     GenServer.cast(pid, {cortex, :sync})
   end

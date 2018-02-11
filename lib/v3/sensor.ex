@@ -16,6 +16,10 @@ defmodule NN.V3.Sensor do
     GenServer.start_link(__MODULE__, exo_self)
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def sync(pid, cortex) do
     GenServer.cast(pid, {cortex, :sync})
   end
@@ -61,7 +65,7 @@ defmodule NN.V3.Sensor do
     apply(__MODULE__, type, [vl, scape, exo_self])
   end
 
-  def get_input(vl, scape, exo_self) do
+  def get_input(_vl, scape, exo_self) do
     {:percept, data} = GenServer.call(scape, {exo_self, :sense})
 
     data
