@@ -1,50 +1,33 @@
 defmodule NN.V3.ExoSelfTest do
-  use ExUnit.Case, async: false
-  alias NN.V3.ExoSelf
-  alias NN.Handlers.Genotype
+  use ExUnit.Case
+  alias NN.Constructors.Phenotype
+  alias NN.Handlers.GenotypeFile
+  alias NN.Genotype
+
+  setup do
+    {:ok, _} = Registry.start_link(keys: :unique, name: NN.PubSub)
+
+    :ok
+  end
 
   test "backup" do
-    genotype = self()
-    file_name = "./test/fixtures/genotypes/xor.nn"
+    {:ok, _} = Registry.register(NN.PubSub, :network_training_complete, [])
+    file_name = String.to_atom("./test/fixtures/genotypes/xor.nn")
+    {:ok, genotype} = Genotype.start_link
+    {:ok, elements} = GenotypeFile.load(file_name)
 
-    {:ok, source} = Genotype.start_link(file_name)
-    :ok = Genotype.load(source)
-    {:ok, _sut} = ExoSelf.start_link(genotype)
+    Genotype.update(genotype, elements)
 
-    assert_receive {:"$gen_call", from, :cortex}
-    {:ok, cortex} = Genotype.cortex(source)
-    GenServer.reply(from, {:ok, cortex})
+    {:ok, exo_self} = Phenotype.construct(genotype)
 
-    assert_receive {:"$gen_call", from, :sensors}
-    {:ok, sensors} = Genotype.sensors(source)
-    GenServer.reply(from, {:ok, sensors})
-
-    assert_receive {:"$gen_call", from, :actuators}
-    {:ok, actuators} = Genotype.actuators(source)
-    GenServer.reply(from, {:ok, actuators})
-
-    assert_receive {:"$gen_call", from, :sensors}
-    {:ok, sensors} = Genotype.sensors(source)
-    GenServer.reply(from, {:ok, sensors})
-
-    assert_receive {:"$gen_call", from, :neurons}
-    {:ok, neurons} = Genotype.neurons(source)
-    GenServer.reply(from, {:ok, neurons})
-
-    assert_receive {:"$gen_call", from, :actuators}
-    {:ok, actuators} = Genotype.actuators(source)
-    GenServer.reply(from, {:ok, actuators})
-
-    Enum.each(1..3, fn(_) ->
-      assert_receive {:"$gen_call", from, {:element, id}}
-      {:ok, element} = Genotype.element(source, id)
-      GenServer.reply(from, {:ok, element})
-    end)
-
-    Enum.each(1..3, fn(_) ->
-      assert_receive {:"$gen_cast", {:update, _element}}
-    end)
-
-    assert_receive {:"$gen_call", _from, {:save, nil}}
+    assert_receive {:"$gen_cast", {
+      :training_complete,
+      ^exo_self,
+      _highest_fitness,
+      _evaluations,
+      _total_cycles,
+      _total_time,
+      ^genotype
+    }}
   end
 end

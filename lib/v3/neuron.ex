@@ -2,7 +2,7 @@ defmodule NN.V3.Neuron do
   use GenServer
 
   @delta_multiplier :math.pi() * 2
-  @saturation_limit :math.pi() * 2
+  @saturation_limit :math.pi() * 20
 
   defmodule State do
     defstruct exo_self: nil,
@@ -23,8 +23,8 @@ defmodule NN.V3.Neuron do
     {:ok, state}
   end
 
-  def get_backup(pid, exo_self) do
-    GenServer.call(pid, {exo_self, :get_backup})
+  def input_weights(pid, exo_self) do
+    GenServer.call(pid, {exo_self, :input_weights})
   end
 
   def backup(pid, exo_self) do
@@ -43,12 +43,11 @@ defmodule NN.V3.Neuron do
     GenServer.cast(pid, {exo_self, :restore})
   end
 
-
   def configure(pid, exo_self, id, cortex, activation_function, input_weights, outputs) do
     GenServer.cast(pid, {exo_self, {id, cortex, activation_function, input_weights, outputs}})
   end
 
-  def handle_call({exo_self, :get_backup}, _from, %{exo_self: exo_self} = state) do
+  def handle_call({exo_self, :input_weights}, _from, %{exo_self: exo_self} = state) do
     %{id: id, memory_input_weights: m} = state
 
     {:reply, {self(), id, m}, state}
@@ -71,11 +70,11 @@ defmodule NN.V3.Neuron do
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights}]} = state) do
-    handle_cast({from, :forward, signal}, %{state | input_weights: [{from, weights} | [0]]})
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights, id}]} = state) do
+    handle_cast({from, :forward, signal}, %{state | input_weights: [{from, weights, id} | [0]]})
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | [bias]]} = state) when is_number(bias) do
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights, _id} | [bias]]} = state) when is_number(bias) do
     result = dot_product(signal, weights)
 
     %{
@@ -92,7 +91,7 @@ defmodule NN.V3.Neuron do
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | input_weights]} = state) do
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights, _id} | input_weights]} = state) do
     %{accumulator: accumulator} = state
 
     result = dot_product(signal, weights)
@@ -146,10 +145,10 @@ defmodule NN.V3.Neuron do
 
   defp perturb_input_weights(input_weights) do
     total_weights = Enum.filter(input_weights, fn(element) ->
-      match?({_, _weights}, element)
+      match?({_pid, _weights, _id}, element)
     end)
     |> Enum.reduce(0, fn(x, acc) ->
-      {_, weights} = x
+      {_pid, weights, _id} = x
       acc + length(weights)
     end)
 
@@ -158,10 +157,10 @@ defmodule NN.V3.Neuron do
     perturb_input_weights(probability, input_weights, [])
   end
 
-  defp perturb_input_weights(probability, [{input, weights} | input_weights], acc) do
+  defp perturb_input_weights(probability, [{input, weights, id} | input_weights], acc) do
     updated_weights = perturb_weights(probability, weights, [])
 
-    perturb_input_weights(probability, input_weights, [{input, updated_weights} | acc])
+    perturb_input_weights(probability, input_weights, [{input, updated_weights, id} | acc])
   end
 
   defp perturb_input_weights(probability, [bias], acc) do

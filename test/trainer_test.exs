@@ -3,6 +3,9 @@ defmodule NN.TrainerTest do
   alias NN.Trainer
 
   setup do
+    {:ok, _} = Registry.start_link(keys: :unique, name: NN.PubSub)
+    {:ok, _} = Registry.register(NN.PubSub, :trainer_training_complete, [])
+
     morphology = :xor
     hidden_layer_densities = [2]
     max_attempts = :infinity
@@ -12,7 +15,6 @@ defmodule NN.TrainerTest do
     {:ok, sut} = Trainer.start_link(
       morphology,
       hidden_layer_densities,
-      self(),
       max_attempts,
       eval_limit,
       fitness_target)
@@ -20,11 +22,20 @@ defmodule NN.TrainerTest do
     [sut: sut]
   end
 
-  test "training complete", %{sut: sut} do
-    assert_receive {:"$gen_cast", {:training_complete, ^sut, :xor, best_fitness, evals, time}}, 5_000
+  test "training complete" do
+    assert_receive {:"$gen_cast", {
+      :training_complete,
+      best_fitness,
+      evals,
+      attempts,
+      time,
+      genotype
+    }}, 1_000
 
-    assert best_fitness > 188
-    assert evals > 100
-    assert time > 1000
+    assert best_fitness > 0
+    assert evals > 0
+    assert attempts > 0
+    assert time > 0
+    assert Process.alive?(genotype)
   end
 end

@@ -6,53 +6,19 @@ defmodule NN.Constructors.Genotype do
     Cortex
   }
 
+  alias NN.Genotype
+
   alias NN.Morphology
 
-  use GenServer
+  def construct(morphology, hidden_layer_densities) do
+    s = Morphology.sensor(morphology)
+    a = Morphology.actuator(morphology)
+    {:ok, genotype} = Genotype.start_link
 
-  defmodule State do
-    defstruct handler: nil,
-      sensor: nil,
-      actuator: nil,
-      hidden_layer_densities: nil
-  end
-
-  def start_link(handler, morphology, hidden_layer_densities) do
-    state = %State{
-      handler: handler,
-      sensor: Morphology.sensor(morphology),
-      actuator: Morphology.actuator(morphology),
-      hidden_layer_densities: hidden_layer_densities
-    }
-
-    GenServer.start_link(__MODULE__, state)
-  end
-
-  def init(state) do
-    {:ok, state}
-  end
-
-  def construct(pid) do
-    GenServer.call(pid, :construct)
-  end
-
-  def handle_call(:construct, _from, state) do
     Random.seed()
 
-    construct_genotype(state)
-
-    {:reply, :ok, state}
-  end
-
-  defp construct_genotype(state) do
-    %{handler: handler,
-      sensor: s,
-      actuator: a,
-      hidden_layer_densities: hld} = state
-
     output_vector_length = actuator(a, :vector_length)
-    layer_densities = List.insert_at(hld, -1, output_vector_length)
-
+    layer_densities = List.insert_at(hidden_layer_densities, -1, output_vector_length)
     cortex_id = {:cortex, generate_id()}
 
     {input_layer, neurons, output_layer} = create_neuro_layers(cortex_id, s, a, layer_densities)
@@ -69,11 +35,12 @@ defmodule NN.Constructors.Genotype do
     sensor = sensor(s, cortex_id: cortex_id, neuron_ids: first_layer_neuron_ids)
     actuator = actuator(a, cortex_id: cortex_id, neuron_ids: last_layer_neuron_ids)
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
+
     List.flatten([cortex, sensor, actuator | neurons])
       |> Enum.each(fn(e) ->
-        GenServer.cast(handler, {:update, e})
+        Genotype.update(genotype, e)
       end)
 
-    GenServer.call(handler, {:save, nil})
+    {:ok, genotype}
   end
 end

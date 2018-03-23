@@ -99,6 +99,7 @@ defmodule NN.V3.Cortex do
   end
 
   def handle_cast({actuator, :sync, fitness, halt}, state) do
+
     GenServer.cast(self(), {actuator, :sync, fitness, halt})
 
     {:noreply, state}
