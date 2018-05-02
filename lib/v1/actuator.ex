@@ -10,6 +10,10 @@ defmodule NN.V1.Actuator do
     GenServer.start_link(__MODULE__, %State{cortex: cortex, env: env})
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def act(pid, input) do
     GenServer.cast(pid, {:forward, input})
   end

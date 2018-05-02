@@ -1,32 +1,28 @@
 defmodule NN.Constructors.GenotypeTest do
   use ExUnit.Case
-  alias NN.Constructors.Genotype
+  alias NN.Constructors.Genotype, as: Constructor
+  alias NN.Genotype
 
   setup do
-    handler = self()
-    sensor_type = :random
-    actuator_type = :print_results
-    hidden_layer_densities = [1, 3]
+    morphology = :xor
+    hidden_layer_densities = [2]
 
-    {:ok, pid} = Genotype.start_link(handler,
-      sensor_type,
-      actuator_type,
-      hidden_layer_densities)
+    {:ok, sut} = Constructor.construct(
+      morphology,
+      hidden_layer_densities
+    )
 
-    [sut: pid]
+    [sut: sut]
   end
 
-  test "create genotype constructor", %{sut: sut} do
+  test "create genotype", %{sut: sut} do
     assert Process.alive?(sut)
   end
 
   test "create elements", %{sut: sut} do
-    Genotype.construct_genotype(sut)
-
-    Enum.each(1..8, fn(_) ->
-      assert_receive {:"$gen_cast", {:update, _element}}
-    end)
-
-    assert_receive {:"$gen_cast", :save}
+    assert {:ok, _cortex} = Genotype.cortex(sut)
+    assert {:ok, _sensors} = Genotype.sensors(sut)
+    assert {:ok, _neurons} = Genotype.neurons(sut)
+    assert {:ok, _actuators} = Genotype.actuators(sut)
   end
 end

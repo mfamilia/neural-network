@@ -9,13 +9,24 @@ defmodule NN.Handlers.Genotype do
       io: nil
   end
 
-  def start_link(file_name, io \\ @io) do
+  def start_link(file_name, io \\ @io)
+
+  def start_link(file_name, io)
+  when is_atom(file_name) do
     state = %State{
-      file_name: String.to_atom(file_name),
+      file_name: file_name,
       io: io
     }
 
     GenServer.start_link(__MODULE__, state)
+  end
+
+  def start_link(file_name, io) do
+    start_link(String.to_atom(file_name), io)
+  end
+
+  def init(state) do
+    {:ok, state}
   end
 
   def load(pid) do
@@ -46,8 +57,8 @@ defmodule NN.Handlers.Genotype do
     GenServer.call(pid, {:element, id})
   end
 
-  def save(pid) do
-    GenServer.cast(pid, :save)
+  def save(pid, file_name \\ nil) do
+    GenServer.call(pid, {:save, file_name})
   end
 
   def update(pid, element) do
@@ -56,6 +67,10 @@ defmodule NN.Handlers.Genotype do
 
   def print(pid) do
     GenServer.cast(pid, :print)
+  end
+
+  def rename(pid, new_file_name) do
+    GenServer.cast(pid, {:rename, new_file_name})
   end
 
   def handle_call(:load, _from, %{file_name: f} = state) do
@@ -83,7 +98,7 @@ defmodule NN.Handlers.Genotype do
   end
 
   def handle_call(:neurons, _from, %{store: store} = state) do
-    {:reply, {:ok, get_elements(store, :neuron)}, state}
+    {:reply, {:ok, get_neurons(store)}, state}
   end
 
   def handle_call(:sensors, _from, %{store: store} = state) do
@@ -100,10 +115,21 @@ defmodule NN.Handlers.Genotype do
     {:reply, {:ok, element}, state}
   end
 
-  def handle_cast(:save, %{file_name: f, store: s} = state) do
+  def handle_call({:save, nil}, _from, %{file_name: f, store: s} = state) do
     :ets.tab2file(s, f)
 
-    {:noreply, state}
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:save, f}, _from, %{store: s} = state)
+  when is_atom(f) do
+    :ets.tab2file(s, f)
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:save, f}, from, state) do
+    handle_call({:save, String.to_atom(f)}, from, state)
   end
 
   def handle_cast({:update, element}, %{store: store} = state) do
@@ -116,7 +142,7 @@ defmodule NN.Handlers.Genotype do
     [
       get_cortex(s),
       get_elements(s, :sensor),
-      get_elements(s, :neuron),
+      get_neurons(s),
       get_elements(s, :actuator),
     ]
     |> List.flatten
@@ -127,12 +153,24 @@ defmodule NN.Handlers.Genotype do
     {:noreply, state}
   end
 
+  def handle_cast({:rename, new_name}, state) do
+    state = %{state |
+      file_name: String.to_atom(new_name)
+    }
+
+    {:noreply, state}
+  end
+
   defp get_cortex(store) do
     [cortex] = :ets.match_object(store, {:cortex, :"_", :"_", :"_", :"_"})
     cortex
   end
 
   defp get_elements(store, key) do
-   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_"})
+   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_", :"_"})
+  end
+
+  defp get_neurons(store) do
+   :ets.match_object(store, {:neuron, :"_", :"_", :"_", :"_", :"_"})
   end
 end

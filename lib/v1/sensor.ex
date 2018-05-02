@@ -10,6 +10,10 @@ defmodule NN.V1.Sensor do
     GenServer.start_link(__MODULE__, %State{neuron: neuron, env: env})
   end
 
+  def init(state) do
+    {:ok, state}
+  end
+
   def sync(pid) do
     GenServer.cast(pid, :sync)
   end

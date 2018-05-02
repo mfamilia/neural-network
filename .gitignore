@@ -4,3 +4,5 @@
 erl_crash.dump
 *.ez
 *.sw[pon]
+rename.nn
+.DS_Store

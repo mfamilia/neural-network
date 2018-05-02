@@ -1,8 +1,6 @@
-defmodule NN.V2.Actuator do
+defmodule NN.V3.Actuator do
   use GenServer
-  alias NN.V2.Cortex
-
-  @io %{puts: &IO.puts/1}
+  alias NN.V3.Cortex
 
   defmodule State do
     defstruct exo_self: nil,
@@ -12,11 +10,12 @@ defmodule NN.V2.Actuator do
       neurons: nil,
       memory: nil,
       signals: nil,
-      io: nil
+      scape: nil
   end
 
-  def start_link(exo_self, io \\ @io) do
-    state = %State{exo_self: exo_self, io: io}
+  def start_link(exo_self) do
+    state = %State{exo_self: exo_self}
+
     GenServer.start_link(__MODULE__, state)
   end
 
@@ -24,22 +23,23 @@ defmodule NN.V2.Actuator do
     {:ok, state}
   end
 
-  def configure(pid, exo_self, id, cortex, actuator_type, neurons) do
-    GenServer.cast(pid, {exo_self, {id, cortex, actuator_type, neurons}})
+  def configure(pid, exo_self, id, cortex, scape, actuator_type, neurons) do
+    GenServer.cast(pid, {exo_self, {id, cortex, scape, actuator_type, neurons}})
   end
 
   def forward(pid, from, signal) do
     GenServer.cast(pid, {from, :forward, signal})
   end
 
-  def handle_cast({exo_self, {id, cortex, actuator_type, neurons}}, %{exo_self: exo_self} = state) do
+  def handle_cast({exo_self, {id, cortex, scape, actuator_type, neurons}}, %{exo_self: exo_self} = state) do
     state = %{state |
       id: id,
       cortex: cortex,
       actuator_type: actuator_type,
       neurons: neurons,
       memory: neurons,
-      signals: []
+      signals: [],
+      scape: scape
     }
 
     {:noreply, state}
@@ -47,15 +47,17 @@ defmodule NN.V2.Actuator do
 
   def handle_cast({neuron, :forward, signal}, %{neurons: [neuron]} = state) do
     %{
+      exo_self: exo_self,
       cortex: c,
       memory: neurons,
       signals: signals,
       actuator_type: type,
-      io: io
+      scape: scape
     } = state
 
-    trigger_cortex(c)
-    apply(__MODULE__, type, [[signal | signals], io])
+    {:fitness, fitness, halt_flag} = apply(__MODULE__, type, [signal ++ signals, scape, exo_self])
+
+    trigger_cortex(c, fitness, halt_flag)
 
     state = %{state | neurons: neurons, signals: []}
 
@@ -63,7 +65,7 @@ defmodule NN.V2.Actuator do
   end
 
   def handle_cast({neuron, :forward, signal}, %{neurons: [neuron | neurons], signals: signals} = state) do
-    state = %{state | neurons: neurons, signals: [signal | signals]}
+    state = %{state | neurons: neurons, signals: signal ++ signals}
 
     {:noreply, state}
   end
@@ -74,13 +76,11 @@ defmodule NN.V2.Actuator do
     {:noreply, state}
   end
 
-  def trigger_cortex(cortex) do
-    Cortex.sync(cortex, self())
+  def trigger_cortex(cortex, fitness, halt_flag) do
+    Cortex.sync(cortex, self(), fitness, halt_flag)
   end
 
-  def print_results(results, io) do
-    reversed_results = Enum.reverse(results)
-
-    io.puts.("Actuator signals: #{inspect reversed_results}")
+  def send_output(output, scape, exo_self) do
+    GenServer.call(scape, {exo_self, :action, Enum.reverse(output)})
   end
 end

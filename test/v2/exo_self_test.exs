@@ -8,7 +8,7 @@ defmodule NN.V2.ExoSelfTest do
   test "backup" do
     with_mock IO, [puts: fn(_) -> :ok end] do
       genotype = self()
-      file_name = "./test/fixtures/genotypes/simple.nn"
+      file_name = "./test/fixtures/genotypes/v2.nn"
 
       {:ok, source} = Genotype.start_link(file_name)
       :ok = Genotype.load(source)
@@ -40,7 +40,11 @@ defmodule NN.V2.ExoSelfTest do
         GenServer.reply(from, {:ok, element})
       end)
 
-      assert_receive {:"$gen_cast", :save}
+      Enum.each(1..5, fn(_) ->
+        assert_receive {:"$gen_cast", {:update, _element}}
+      end)
+
+      assert_receive {:"$gen_call", _from, {:save, nil}}
     end
   end
 end
