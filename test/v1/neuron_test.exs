@@ -16,13 +16,13 @@ defmodule NN.V1.NeuronTest do
   end
 
   test "sense output" do
-    with_mock Random, [uniform: fn -> 1 end] do
+    with_mock Random, uniform: fn -> 1 end do
       {:ok, neuron} = NN.V1.Neuron.start_link(self())
 
       NN.V1.Neuron.weights(neuron)
-        |> Enum.each(fn(x) ->
-          assert ^x = 0.5
-        end)
+      |> Enum.each(fn x ->
+        assert ^x = 0.5
+      end)
 
       signal = [1, 2]
       NN.V1.Neuron.sense(neuron, signal)
@@ -33,9 +33,9 @@ defmodule NN.V1.NeuronTest do
 
   test "random weights", %{neuron: neuron} do
     NN.V1.Neuron.weights(neuron)
-      |> Enum.each(fn(x) ->
-        assert x >= -0.5
-        assert x <= 0.5
-      end)
+    |> Enum.each(fn x ->
+      assert x >= -0.5
+      assert x <= 0.5
+    end)
   end
 end

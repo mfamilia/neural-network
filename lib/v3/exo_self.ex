@@ -10,13 +10,13 @@ defmodule NN.V3.ExoSelf do
 
   defmodule State do
     defstruct cortex: nil,
-      highest_fitness: nil,
-      evaluations: nil,
-      total_cycles: nil,
-      attempt: nil,
-      total_time: nil,
-      neurons: nil,
-      genotype: nil
+              highest_fitness: nil,
+              evaluations: nil,
+              total_cycles: nil,
+              attempt: nil,
+              total_time: nil,
+              neurons: nil,
+              genotype: nil
   end
 
   def start_link() do
@@ -32,21 +32,25 @@ defmodule NN.V3.ExoSelf do
   end
 
   def handle_cast({:configure, cortex, neurons, genotype}, state) do
-    state = %{state |
-      cortex: cortex,
-      neurons: neurons,
-      genotype: genotype,
-      highest_fitness: 0,
-      evaluations: 0,
-      total_cycles: 0,
-      total_time: 0,
-      attempt: 1
+    state = %{
+      state
+      | cortex: cortex,
+        neurons: neurons,
+        genotype: genotype,
+        highest_fitness: 0,
+        evaluations: 0,
+        total_cycles: 0,
+        total_time: 0,
+        attempt: 1
     }
 
     {:noreply, state}
   end
 
-  def handle_cast({cortex, :evaluation_completed, fitness, cycles, time}, %{cortex: cortex} = state) do
+  def handle_cast(
+        {cortex, :evaluation_completed, fitness, cycles, time},
+        %{cortex: cortex} = state
+      ) do
     %{
       highest_fitness: hf,
       attempt: a,
@@ -55,21 +59,23 @@ defmodule NN.V3.ExoSelf do
 
     exo_self = self()
 
-    {highest_fitness, attempt} = case fitness > hf do
-      true ->
-        Enum.each(neurons, fn(n) ->
-          Neuron.backup(n, exo_self)
-        end)
+    {highest_fitness, attempt} =
+      case fitness > hf do
+        true ->
+          Enum.each(neurons, fn n ->
+            Neuron.backup(n, exo_self)
+          end)
 
-        {fitness, 0}
-      false ->
-        Process.get(:perturbed)
-        |> Enum.each(fn(n) ->
-          Neuron.restore(n, exo_self)
-        end)
+          {fitness, 0}
 
-        {hf, a + 1}
-    end
+        false ->
+          Process.get(:perturbed)
+          |> Enum.each(fn n ->
+            Neuron.restore(n, exo_self)
+          end)
+
+          {hf, a + 1}
+      end
 
     %{
       total_cycles: tc,
@@ -104,27 +110,30 @@ defmodule NN.V3.ExoSelf do
         end)
 
         {:stop, :normal, state}
+
       false ->
         total_neurons = length(neurons)
         probability = 1 / :math.sqrt(total_neurons)
 
-        perturbed = neurons
-        |> Enum.filter(fn(_) ->
-          Random.uniform() < probability
-        end)
+        perturbed =
+          neurons
+          |> Enum.filter(fn _ ->
+            Random.uniform() < probability
+          end)
 
-        Enum.each(perturbed, fn(n) ->
+        Enum.each(perturbed, fn n ->
           Neuron.perturb(n, exo_self)
         end)
 
         Process.put(:perturbed, perturbed)
 
-        state = %{state |
-          highest_fitness: highest_fitness,
-          total_cycles: total_cycles,
-          evaluations: evaluations + 1,
-          total_time: total_time,
-          attempt: attempt
+        state = %{
+          state
+          | highest_fitness: highest_fitness,
+            total_cycles: total_cycles,
+            evaluations: evaluations + 1,
+            total_time: total_time,
+            attempt: attempt
         }
 
         Cortex.reactivate(cortex, exo_self)
@@ -140,8 +149,9 @@ defmodule NN.V3.ExoSelf do
   defp update_genotype(genotype, exo_self, [n | neurons]) do
     {^n, id, input_weights} = Neuron.input_weights(n, exo_self)
 
-    weights = input_weights
-      |> Enum.map(fn(x) ->
+    weights =
+      input_weights
+      |> Enum.map(fn x ->
         case x do
           {_pid, weights, eid} -> {eid, weights}
           _ -> x
@@ -157,5 +167,4 @@ defmodule NN.V3.ExoSelf do
   end
 
   defp update_genotype(_genotype, _exo_self, []), do: :ok
-
 end

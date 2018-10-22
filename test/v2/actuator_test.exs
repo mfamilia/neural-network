@@ -4,7 +4,7 @@ defmodule NN.V2.ActuatorTest do
 
   setup do
     exo_self = self()
-    io = %{puts: fn(msg) -> send(exo_self, {:puts, msg}) end}
+    io = %{puts: fn msg -> send(exo_self, {:puts, msg}) end}
     {:ok, sut} = Actuator.start_link(exo_self, io)
 
     [sut: sut, exo_self: exo_self]
@@ -41,7 +41,7 @@ defmodule NN.V2.ActuatorTest do
     Actuator.forward(sut, neuron1, [3, 5])
 
     signals = [[3, 5], [1, 2]]
-    printed = "Actuator signals: #{inspect signals}"
+    printed = "Actuator signals: #{inspect(signals)}"
     assert_receive {:puts, ^printed}, 2_000
   end
 end

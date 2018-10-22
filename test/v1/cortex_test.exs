@@ -18,7 +18,7 @@ defmodule NN.V1.CortexTest do
 
     assert_receive {:"$gen_call", from, :sense}
 
-    GenServer.reply from, [Random.uniform, Random.uniform]
+    GenServer.reply(from, [Random.uniform(), Random.uniform()])
 
     assert_receive {:"$gen_cast", {:act, [x]}}
     assert x >= -1

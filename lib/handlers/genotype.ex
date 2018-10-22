@@ -5,14 +5,14 @@ defmodule NN.Handlers.Genotype do
 
   defmodule State do
     defstruct file_name: nil,
-      store: nil,
-      io: nil
+              store: nil,
+              io: nil
   end
 
   def start_link(file_name, io \\ @io)
 
   def start_link(file_name, io)
-  when is_atom(file_name) do
+      when is_atom(file_name) do
     state = %State{
       file_name: file_name,
       io: io
@@ -76,9 +76,7 @@ defmodule NN.Handlers.Genotype do
   def handle_call(:load, _from, %{file_name: f} = state) do
     {:ok, store} = :ets.file2tab(f)
 
-    state = %{state |
-      store: store
-    }
+    state = %{state | store: store}
 
     {:reply, :ok, state}
   end
@@ -86,9 +84,7 @@ defmodule NN.Handlers.Genotype do
   def handle_call(:new, _from, %{file_name: f} = state) do
     store = :ets.new(f, [:private, :set, {:keypos, 2}])
 
-    state = %{state |
-      store: store
-    }
+    state = %{state | store: store}
 
     {:reply, :ok, state}
   end
@@ -122,7 +118,7 @@ defmodule NN.Handlers.Genotype do
   end
 
   def handle_call({:save, f}, _from, %{store: s} = state)
-  when is_atom(f) do
+      when is_atom(f) do
     :ets.tab2file(s, f)
 
     {:reply, :ok, state}
@@ -143,34 +139,32 @@ defmodule NN.Handlers.Genotype do
       get_cortex(s),
       get_elements(s, :sensor),
       get_neurons(s),
-      get_elements(s, :actuator),
+      get_elements(s, :actuator)
     ]
-    |> List.flatten
-    |> Enum.each(fn(e) ->
-      io.puts.(inspect e)
+    |> List.flatten()
+    |> Enum.each(fn e ->
+      io.puts.(inspect(e))
     end)
 
     {:noreply, state}
   end
 
   def handle_cast({:rename, new_name}, state) do
-    state = %{state |
-      file_name: String.to_atom(new_name)
-    }
+    state = %{state | file_name: String.to_atom(new_name)}
 
     {:noreply, state}
   end
 
   defp get_cortex(store) do
-    [cortex] = :ets.match_object(store, {:cortex, :"_", :"_", :"_", :"_"})
+    [cortex] = :ets.match_object(store, {:cortex, :_, :_, :_, :_})
     cortex
   end
 
   defp get_elements(store, key) do
-   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_", :"_"})
+    :ets.match_object(store, {key, :_, :_, :_, :_, :_, :_})
   end
 
   defp get_neurons(store) do
-   :ets.match_object(store, {:neuron, :"_", :"_", :"_", :"_", :"_"})
+    :ets.match_object(store, {:neuron, :_, :_, :_, :_, :_})
   end
 end

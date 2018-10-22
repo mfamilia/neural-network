@@ -3,7 +3,7 @@ defmodule NN.V1.Actuator do
 
   defmodule State do
     defstruct cortex: nil,
-      env: nil
+              env: nil
   end
 
   def start_link(cortex, env) do
@@ -19,7 +19,7 @@ defmodule NN.V1.Actuator do
   end
 
   def handle_cast({:forward, input}, %{env: env} = state) do
-    GenServer.cast env, {:act, input}
+    GenServer.cast(env, {:act, input})
 
     {:noreply, state}
   end

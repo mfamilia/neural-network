@@ -5,13 +5,15 @@ defmodule NN.NetworkElementTypesTest do
   import NN.NetworkElementTypes
 
   test "create sensor records" do
-    s = sensor(
-      id: {:sensor, 123.4},
-      cortex_id: {:cortex, 32.4},
-      type: :type,
-      vector_length: 3,
-      neuron_ids: [:id],
-      scape: :scape)
+    s =
+      sensor(
+        id: {:sensor, 123.4},
+        cortex_id: {:cortex, 32.4},
+        type: :type,
+        vector_length: 3,
+        neuron_ids: [:id],
+        scape: :scape
+      )
 
     assert sensor(s, :id) == {:sensor, 123.4}
     assert sensor(s, :cortex_id) == {:cortex, 32.4}
@@ -22,13 +24,15 @@ defmodule NN.NetworkElementTypesTest do
   end
 
   test "create actuator records" do
-    s = actuator(
-      id: {:actuator, 123.4},
-      cortex_id: {:cortex, 32.4},
-      type: :type,
-      vector_length: 3,
-      neuron_ids: [:id],
-      scape: :scape)
+    s =
+      actuator(
+        id: {:actuator, 123.4},
+        cortex_id: {:cortex, 32.4},
+        type: :type,
+        vector_length: 3,
+        neuron_ids: [:id],
+        scape: :scape
+      )
 
     assert actuator(s, :id) == {:actuator, 123.4}
     assert actuator(s, :cortex_id) == {:cortex, 32.4}
@@ -39,24 +43,30 @@ defmodule NN.NetworkElementTypesTest do
   end
 
   test "create neuron records" do
-    n = neuron(id: {:neuron, 24.5},
-               cortex_id: {:cortex, 32.4},
-               activation_function: &:math.tanh(&1),
-               input_weights: [:id],
-               output_ids: [:id])
+    n =
+      neuron(
+        id: {:neuron, 24.5},
+        cortex_id: {:cortex, 32.4},
+        activation_function: &:math.tanh(&1),
+        input_weights: [:id],
+        output_ids: [:id]
+      )
 
     assert neuron(n, :id) == {:neuron, 24.5}
     assert neuron(n, :cortex_id) == {:cortex, 32.4}
-    assert neuron(n, :activation_function) == &:math.tanh(&1)
+    assert neuron(n, :activation_function) == (&:math.tanh(&1))
     assert neuron(n, :input_weights) == [:id]
     assert neuron(n, :output_ids) == [:id]
   end
 
   test "create cortex records" do
-    c = cortex(id: {:cortex, 432.4},
-               sensor_ids: [:id],
-               actuator_ids: [:id],
-               neuron_ids: [:id])
+    c =
+      cortex(
+        id: {:cortex, 432.4},
+        sensor_ids: [:id],
+        actuator_ids: [:id],
+        neuron_ids: [:id]
+      )
 
     assert cortex(c, :id) == {:cortex, 432.4}
     assert cortex(c, :sensor_ids) == [:id]

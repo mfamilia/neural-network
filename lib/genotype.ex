@@ -69,12 +69,6 @@ defmodule NN.Genotype do
     {:reply, {:ok, element}, state}
   end
 
-  def handle_call({:element, id}, _from, %{store: store} = state) do
-    [element] = :ets.lookup(store, id)
-
-    {:reply, {:ok, element}, state}
-  end
-
   def handle_cast({:update, element}, %{store: store} = state) do
     :ets.insert(store, element)
 
@@ -82,15 +76,15 @@ defmodule NN.Genotype do
   end
 
   defp get_cortex(store) do
-    [cortex] = :ets.match_object(store, {:cortex, :"_", :"_", :"_", :"_"})
+    [cortex] = :ets.match_object(store, {:cortex, :_, :_, :_, :_})
     cortex
   end
 
   defp get_elements(store, key) do
-   :ets.match_object(store, {key, :"_", :"_", :"_", :"_", :"_", :"_"})
+    :ets.match_object(store, {key, :_, :_, :_, :_, :_, :_})
   end
 
   defp get_neurons(store) do
-   :ets.match_object(store, {:neuron, :"_", :"_", :"_", :"_", :"_"})
+    :ets.match_object(store, {:neuron, :_, :_, :_, :_, :_})
   end
 end

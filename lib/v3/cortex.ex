@@ -4,16 +4,16 @@ defmodule NN.V3.Cortex do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      sensors: nil,
-      actuators: nil,
-      neurons: nil,
-      cycles: nil,
-      memory: nil,
-      start_time: nil,
-      fitness: nil,
-      status: nil,
-      halts: nil
+              id: nil,
+              sensors: nil,
+              actuators: nil,
+              neurons: nil,
+              cycles: nil,
+              memory: nil,
+              start_time: nil,
+              fitness: nil,
+              status: nil,
+              halts: nil
   end
 
   def start_link(exo_self) do
@@ -57,14 +57,10 @@ defmodule NN.V3.Cortex do
   end
 
   def handle_cast({actuator, :sync, fitness, halt}, %{actuators: [actuator], halts: h} = state)
-    when h + halt > 0 do
-
+      when h + halt > 0 do
     %{fitness: f} = state
 
-    state = %{state |
-      fitness: f + fitness,
-      status: :inactive
-    }
+    state = %{state | fitness: f + fitness, status: :inactive}
 
     send_evalution_report(state)
 
@@ -76,30 +72,20 @@ defmodule NN.V3.Cortex do
 
     trigger_sensors(s)
 
-    state = %{state |
-      actuators: m,
-      cycles: c + 1,
-      fitness: f + fitness
-    }
+    state = %{state | actuators: m, cycles: c + 1, fitness: f + fitness}
 
     {:noreply, state}
   end
 
   def handle_cast({actuator, :sync, fitness, halt}, %{actuators: [actuator | actuators]} = state) do
-
     %{halts: h, fitness: f} = state
 
-    state = %{state |
-      actuators: actuators,
-      halts: h + halt,
-      fitness: f + fitness
-    }
+    state = %{state | actuators: actuators, halts: h + halt, fitness: f + fitness}
 
     {:noreply, state}
   end
 
   def handle_cast({actuator, :sync, fitness, halt}, state) do
-
     GenServer.cast(self(), {actuator, :sync, fitness, halt})
 
     {:noreply, state}
@@ -110,22 +96,16 @@ defmodule NN.V3.Cortex do
 
     trigger_sensors(sensors)
 
-    state = %{state |
-      fitness: 0,
-      halts: 0,
-      actuators: memory,
-      start_time: now(),
-      status: :active
-    }
+    state = %{state | fitness: 0, halts: 0, actuators: memory, start_time: now(), status: :active}
 
     {:noreply, state}
   end
 
   def terminate(_reason, %{sensors: sensors, memory: actuators, neurons: neurons}) do
     [sensors, actuators, neurons]
-      |> Enum.each(fn(x) ->
-        Enum.each(x, &GenServer.stop/1)
-      end)
+    |> Enum.each(fn x ->
+      Enum.each(x, &GenServer.stop/1)
+    end)
   end
 
   defp send_evalution_report(state) do
@@ -137,12 +117,12 @@ defmodule NN.V3.Cortex do
   end
 
   defp trigger_sensors(sensors) do
-    Enum.each(sensors, fn(s) ->
+    Enum.each(sensors, fn s ->
       Sensor.sync(s, self())
     end)
   end
 
   defp now do
-    :erlang.timestamp
+    :erlang.timestamp()
   end
 end

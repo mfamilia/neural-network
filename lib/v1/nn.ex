@@ -4,7 +4,7 @@ defmodule NN.V1.NN do
 
   defmodule State do
     defstruct cortex: nil,
-      env: nil
+              env: nil
   end
 
   def start_link do
@@ -12,7 +12,7 @@ defmodule NN.V1.NN do
   end
 
   def init(state) do
-    {:ok, e} = Env.start_link
+    {:ok, e} = Env.start_link()
     {:ok, c} = Cortex.start_link(e)
 
     {:ok, %{state | cortex: c, env: e}}
@@ -33,7 +33,8 @@ defmodule NN.V1.NN do
   end
 
   def terminate(_reason, %{cortex: c, env: e}) do
-    [c, e] |> Enum.each(fn(x) ->
+    [c, e]
+    |> Enum.each(fn x ->
       GenServer.stop(x)
     end)
   end

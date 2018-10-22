@@ -5,7 +5,7 @@ defmodule NN.GenotypeTest do
   import NN.NetworkElementTypes
 
   setup do
-    {:ok, sut} = Genotype.start_link
+    {:ok, sut} = Genotype.start_link()
 
     [sut: sut]
   end
@@ -15,7 +15,13 @@ defmodule NN.GenotypeTest do
   end
 
   test "get/update cortex element", %{sut: sut} do
-    c = cortex(id: :cortex, sensor_ids: "sensor_ids", actuator_ids: "actuator_ids", neuron_ids: "neuron_ids")
+    c =
+      cortex(
+        id: :cortex,
+        sensor_ids: "sensor_ids",
+        actuator_ids: "actuator_ids",
+        neuron_ids: "neuron_ids"
+      )
 
     Genotype.update(sut, c)
 
@@ -39,11 +45,14 @@ defmodule NN.GenotypeTest do
   end
 
   test "get/update neuron elements", %{sut: sut} do
-    n = neuron(id: :id,
-      cortex_id: "cortex_id",
-      activation_function: :tanh,
-      input_weights: "input_weights",
-      output_ids: "output_ids")
+    n =
+      neuron(
+        id: :id,
+        cortex_id: "cortex_id",
+        activation_function: :tanh,
+        input_weights: "input_weights",
+        output_ids: "output_ids"
+      )
 
     Genotype.update(sut, n)
 
@@ -52,7 +61,7 @@ defmodule NN.GenotypeTest do
 
   test "find element" do
     file_name = String.to_atom("./test/fixtures/genotypes/xor.nn")
-    {:ok, genotype} = Genotype.start_link
+    {:ok, genotype} = Genotype.start_link()
     {:ok, elements} = GenotypeFile.load(file_name)
 
     Genotype.update(genotype, elements)

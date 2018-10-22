@@ -18,17 +18,17 @@ defmodule NN.V1.Env do
   end
 
   def handle_call(:sense, _from, state) do
-    input = [Random.uniform, Random.uniform]
+    input = [Random.uniform(), Random.uniform()]
 
-    IO.puts "****Sensing****:"
-    IO.puts "Signal from the environment: #{inspect input}"
+    IO.puts("****Sensing****:")
+    IO.puts("Signal from the environment: #{inspect(input)}")
 
     {:reply, input, state}
   end
 
   def handle_cast({:act, output}, state) do
-    IO.puts "****Acting****:"
-    IO.puts "Using: #{inspect output} to act on environment."
+    IO.puts("****Acting****:")
+    IO.puts("Using: #{inspect(output)} to act on environment.")
 
     {:noreply, state}
   end

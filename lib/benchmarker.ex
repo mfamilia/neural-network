@@ -10,26 +10,26 @@ defmodule NN.Benchmarker do
 
   defmodule State do
     defstruct morphology: nil,
-      hidden_layer_densities: nil,
-      max_attempts: nil,
-      eval_limit: nil,
-      fitness_target: nil,
-      fitness: nil,
-      total_runs: nil,
-      evals: nil,
-      runs: nil,
-      cycles: nil,
-      time: nil
+              hidden_layer_densities: nil,
+              max_attempts: nil,
+              eval_limit: nil,
+              fitness_target: nil,
+              fitness: nil,
+              total_runs: nil,
+              evals: nil,
+              runs: nil,
+              cycles: nil,
+              time: nil
   end
 
   def start_link(
-    morphology,
-    hidden_layer_densities,
-    max_attempts \\ @max_attempts,
-    eval_limit \\ @eval_limit,
-    fitness_target \\ @fitness_target,
-    total_runs \\ @total_runs) do
-
+        morphology,
+        hidden_layer_densities,
+        max_attempts \\ @max_attempts,
+        eval_limit \\ @eval_limit,
+        fitness_target \\ @fitness_target,
+        total_runs \\ @total_runs
+      ) do
     state = %State{
       morphology: morphology,
       hidden_layer_densities: hidden_layer_densities,
@@ -65,11 +65,12 @@ defmodule NN.Benchmarker do
       time: t
     } = state
 
-    state = %{state |
-      fitness: [fitness | f],
-      evals: [evals | e],
-      cycles: [cycles | c],
-      time: [time | t]
+    state = %{
+      state
+      | fitness: [fitness | f],
+        evals: [evals | e],
+        cycles: [cycles | c],
+        time: [time | t]
     }
 
     case runs >= total_runs do
@@ -134,6 +135,7 @@ defmodule NN.Benchmarker do
   end
 
   defp calculate_stats(key, list, list, sum \\ 0, count \\ 0, min \\ :infinity, max \\ 0)
+
   defp calculate_stats(key, [], list, sum, count, min, max) do
     avg = sum / count
 
@@ -148,9 +150,11 @@ defmodule NN.Benchmarker do
   end
 
   defp std(list, avg, sum \\ 0, count \\ 0)
+
   defp std([], _avg, sum, count) do
     :math.sqrt(sum / count)
   end
+
   defp std([head | tail], avg, sum, count) do
     std(tail, avg, sum + :math.pow(avg - head, 2), count + 1)
   end

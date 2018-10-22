@@ -4,12 +4,12 @@ defmodule NN.V3.Sensor do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      scape: nil,
-      sensor_type: nil,
-      vector_length: nil,
-      neurons: nil
+              id: nil,
+              cortex: nil,
+              scape: nil,
+              sensor_type: nil,
+              vector_length: nil,
+              neurons: nil
   end
 
   def start_link(exo_self) do
@@ -47,7 +47,7 @@ defmodule NN.V3.Sensor do
 
     %{neurons: neurons} = state
 
-    Enum.each(neurons, fn(n) ->
+    Enum.each(neurons, fn n ->
       Neuron.forward(n, self(), signal)
     end)
 

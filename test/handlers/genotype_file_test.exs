@@ -6,9 +6,9 @@ defmodule NN.Handlers.GenotypeFileTest do
     f = "./test/genotype.nn"
     File.rm(f)
 
-    on_exit fn ->
+    on_exit(fn ->
       File.rm(f)
-    end
+    end)
 
     [
       file_path: String.to_atom(f),

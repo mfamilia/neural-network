@@ -6,7 +6,7 @@ defmodule NN.V2.ExoSelfTest do
   import Mock
 
   test "backup" do
-    with_mock IO, [puts: fn(_) -> :ok end] do
+    with_mock IO, puts: fn _ -> :ok end do
       genotype = self()
       file_name = "./test/fixtures/genotypes/v2.nn"
 
@@ -34,13 +34,13 @@ defmodule NN.V2.ExoSelfTest do
       {:ok, actuators} = Genotype.actuators(source)
       GenServer.reply(from, {:ok, actuators})
 
-      Enum.each(1..5, fn(_) ->
+      Enum.each(1..5, fn _ ->
         assert_receive {:"$gen_call", from, {:element, id}}
         {:ok, element} = Genotype.element(source, id)
         GenServer.reply(from, {:ok, element})
       end)
 
-      Enum.each(1..5, fn(_) ->
+      Enum.each(1..5, fn _ ->
         assert_receive {:"$gen_cast", {:update, _element}}
       end)
 

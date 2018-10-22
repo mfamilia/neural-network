@@ -13,21 +13,22 @@ defmodule NN.V3.ExoSelfTest do
   test "backup" do
     {:ok, _} = Registry.register(NN.PubSub, :network_training_complete, [])
     file_name = String.to_atom("./test/fixtures/genotypes/xor.nn")
-    {:ok, genotype} = Genotype.start_link
+    {:ok, genotype} = Genotype.start_link()
     {:ok, elements} = GenotypeFile.load(file_name)
 
     Genotype.update(genotype, elements)
 
     {:ok, exo_self} = Phenotype.construct(genotype)
 
-    assert_receive {:"$gen_cast", {
-      :training_complete,
-      ^exo_self,
-      _highest_fitness,
-      _evaluations,
-      _total_cycles,
-      _total_time,
-      ^genotype
-    }}
+    assert_receive {:"$gen_cast",
+                    {
+                      :training_complete,
+                      ^exo_self,
+                      _highest_fitness,
+                      _evaluations,
+                      _total_cycles,
+                      _total_time,
+                      ^genotype
+                    }}
   end
 end

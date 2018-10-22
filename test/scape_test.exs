@@ -6,11 +6,12 @@ defmodule NN.ScapeTest do
     exo_self = self()
     scape_type = :xor
 
-    {:ok, sut} = Scape.start_link(
-      exo_self,
-      scape_type
-    )
+    {:ok, sut} =
+      Scape.start_link(
+        exo_self,
+        scape_type
+      )
 
-    assert Process.alive? sut
+    assert Process.alive?(sut)
   end
 end

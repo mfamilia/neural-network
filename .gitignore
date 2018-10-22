@@ -6,3 +6,9 @@ erl_crash.dump
 *.sw[pon]
 rename.nn
 .DS_Store
+
+best
+
+experimental
+
+Mnesia\.nonode@nohost/

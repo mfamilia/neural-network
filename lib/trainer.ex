@@ -9,23 +9,23 @@ defmodule NN.Trainer do
 
   defmodule State do
     defstruct morphology: nil,
-      hidden_layer_densities: nil,
-      attempts: nil,
-      evals: nil,
-      fitness_target: nil,
-      best_fitness: nil,
-      cycles: nil,
-      time: nil,
-      genotype: nil
+              hidden_layer_densities: nil,
+              attempts: nil,
+              evals: nil,
+              fitness_target: nil,
+              best_fitness: nil,
+              cycles: nil,
+              time: nil,
+              genotype: nil
   end
 
   def start_link(
-    morphology,
-    hidden_layer_densities,
-    max_attempts \\ @max_attempts,
-    eval_limit \\ @eval_limit,
-    fitness_target \\ @fitness_target) do
-
+        morphology,
+        hidden_layer_densities,
+        max_attempts \\ @max_attempts,
+        eval_limit \\ @eval_limit,
+        fitness_target \\ @fitness_target
+      ) do
     state = %State{
       morphology: morphology,
       hidden_layer_densities: hidden_layer_densities,
@@ -53,16 +53,18 @@ defmodule NN.Trainer do
     GenServer.cast(pid, {:training_complete, exo_self, fitness, evals, cycles, time, genotype})
   end
 
-  def handle_cast({
-      :training_complete,
-      _exo_self,
-      fitness,
-      evals,
-      cycles,
-      time,
-      genotype
-    }, state) do
-
+  def handle_cast(
+        {
+          :training_complete,
+          _exo_self,
+          fitness,
+          evals,
+          cycles,
+          time,
+          genotype
+        },
+        state
+      ) do
     %{
       evals: {e, eval_limit},
       cycles: c,
@@ -72,28 +74,20 @@ defmodule NN.Trainer do
       genotype: g
     } = state
 
-    state = %{state |
-      evals: {e + evals, eval_limit},
-      cycles: c + cycles,
-      time: t + time
-    }
+    state = %{state | evals: {e + evals, eval_limit}, cycles: c + cycles, time: t + time}
 
     has_improved = fitness > bf
-    state = case has_improved do
-      true ->
-        if g, do: GenServer.stop(g)
 
-        %{state |
-          attempts: {1, max_attempts},
-          best_fitness: fitness,
-          genotype: genotype
-        }
-      false ->
-        %{state |
-          attempts: {a + 1, max_attempts},
-          best_fitness: bf
-        }
-    end
+    state =
+      case has_improved do
+        true ->
+          if g, do: GenServer.stop(g)
+
+          %{state | attempts: {1, max_attempts}, best_fitness: fitness, genotype: genotype}
+
+        false ->
+          %{state | attempts: {a + 1, max_attempts}, best_fitness: bf}
+      end
 
     case state do
       %{
@@ -101,9 +95,12 @@ defmodule NN.Trainer do
         evals: {e, eval_limit},
         best_fitness: bf,
         fitness_target: ft
-      } when (a >= max_attempts) or (e >= eval_limit) or (bf >= ft)
-        -> report(state)
-      _ -> train(state)
+      }
+      when a >= max_attempts or e >= eval_limit or bf >= ft ->
+        report(state)
+
+      _ ->
+        train(state)
     end
   end
 

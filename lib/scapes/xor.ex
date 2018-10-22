@@ -1,12 +1,12 @@
 defmodule NN.Scapes.Xor do
   use GenServer
 
-  @xor [{[-1,-1],[-1]},{[1,-1],[1]},{[-1,1],[1]},{[1,1],[-1]}]
+  @xor [{[-1, -1], [-1]}, {[1, -1], [1]}, {[-1, 1], [1]}, {[1, 1], [-1]}]
 
   defmodule State do
     defstruct exo_self: nil,
-      xor: nil,
-      total_error: nil
+              xor: nil,
+              total_error: nil
   end
 
   def start_link(exo_self) do
@@ -29,7 +29,11 @@ defmodule NN.Scapes.Xor do
     {:reply, {:percept, input}, state}
   end
 
-  def handle_call({exo_self, :action, output}, _from, %{exo_self: exo_self, xor: [{_input, correct_output}]} = state) do
+  def handle_call(
+        {exo_self, :action, output},
+        _from,
+        %{exo_self: exo_self, xor: [{_input, correct_output}]} = state
+      ) do
     %{total_error: total_error} = state
 
     error = list_compare(output, correct_output, 0)
@@ -37,10 +41,7 @@ defmodule NN.Scapes.Xor do
     fitness = total_fitness(total_error + error)
     halt_flag = 1
 
-    state = %{state |
-      xor: @xor,
-      total_error: 0
-    }
+    state = %{state | xor: @xor, total_error: 0}
 
     {:reply, {:fitness, fitness, halt_flag}, state}
   end
@@ -53,10 +54,7 @@ defmodule NN.Scapes.Xor do
 
     error = list_compare(output, correct_output, 0)
 
-    state = %{state |
-      xor: xor,
-      total_error: total_error + error
-    }
+    state = %{state | xor: xor, total_error: total_error + error}
 
     fitness = 0
     halt_flag = 0

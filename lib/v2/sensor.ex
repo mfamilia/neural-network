@@ -4,11 +4,11 @@ defmodule NN.V2.Sensor do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      sensor_type: nil,
-      vector_length: nil,
-      neurons: nil
+              id: nil,
+              cortex: nil,
+              sensor_type: nil,
+              vector_length: nil,
+              neurons: nil
   end
 
   def start_link(exo_self) do
@@ -43,7 +43,7 @@ defmodule NN.V2.Sensor do
   def handle_cast({cortex, :sync}, %{neurons: neurons, cortex: cortex} = state) do
     signal = sensory_vector(state)
 
-    Enum.each(neurons, fn(n) ->
+    Enum.each(neurons, fn n ->
       Neuron.forward(n, self(), signal)
     end)
 
@@ -59,6 +59,6 @@ defmodule NN.V2.Sensor do
   end
 
   def random(vl, acc) do
-    random(vl - 1, [Random.uniform | acc])
+    random(vl - 1, [Random.uniform() | acc])
   end
 end

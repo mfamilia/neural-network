@@ -6,13 +6,13 @@ defmodule NN.V2.Actuator do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      actuator_type: nil,
-      neurons: nil,
-      memory: nil,
-      signals: nil,
-      io: nil
+              id: nil,
+              cortex: nil,
+              actuator_type: nil,
+              neurons: nil,
+              memory: nil,
+              signals: nil,
+              io: nil
   end
 
   def start_link(exo_self, io \\ @io) do
@@ -33,13 +33,14 @@ defmodule NN.V2.Actuator do
   end
 
   def handle_cast({exo_self, {id, cortex, actuator_type, neurons}}, %{exo_self: exo_self} = state) do
-    state = %{state |
-      id: id,
-      cortex: cortex,
-      actuator_type: actuator_type,
-      neurons: neurons,
-      memory: neurons,
-      signals: []
+    state = %{
+      state
+      | id: id,
+        cortex: cortex,
+        actuator_type: actuator_type,
+        neurons: neurons,
+        memory: neurons,
+        signals: []
     }
 
     {:noreply, state}
@@ -62,7 +63,10 @@ defmodule NN.V2.Actuator do
     {:noreply, state}
   end
 
-  def handle_cast({neuron, :forward, signal}, %{neurons: [neuron | neurons], signals: signals} = state) do
+  def handle_cast(
+        {neuron, :forward, signal},
+        %{neurons: [neuron | neurons], signals: signals} = state
+      ) do
     state = %{state | neurons: neurons, signals: [signal | signals]}
 
     {:noreply, state}
@@ -81,6 +85,6 @@ defmodule NN.V2.Actuator do
   def print_results(results, io) do
     reversed_results = Enum.reverse(results)
 
-    io.puts.("Actuator signals: #{inspect reversed_results}")
+    io.puts.("Actuator signals: #{inspect(reversed_results)}")
   end
 end

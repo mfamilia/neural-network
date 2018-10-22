@@ -40,14 +40,14 @@ defmodule NN.V2.CortexTest do
   end
 
   test "terminates after cycles", %{sut: sut, exo_self: exo_self} do
-    Process.flag :trap_exit, true
+    Process.flag(:trap_exit, true)
     id = :id
     {:ok, sensor} = Sensor.start_link(exo_self)
     Sensor.configure(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator1} = Actuator.start_link(exo_self)
     {:ok, actuator2} = Actuator.start_link(exo_self)
     {:ok, neuron} = Neuron.start_link(exo_self)
-    Neuron.configure(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
+    Neuron.configure(neuron, exo_self, UUID.uuid4(), sut, &:math.tanh/1, [], [])
     cycles = 3
 
     Cortex.configure(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron], cycles)
@@ -64,13 +64,13 @@ defmodule NN.V2.CortexTest do
   end
 
   test "backup neurons", %{sut: sut, exo_self: exo_self} do
-    Process.flag :trap_exit, true
+    Process.flag(:trap_exit, true)
     id = :id
     {:ok, sensor} = Sensor.start_link(exo_self)
     Sensor.configure(sensor, exo_self, id, sut, :random, 2, [])
     {:ok, actuator} = Actuator.start_link(exo_self)
     {:ok, neuron} = Neuron.start_link(exo_self)
-    Neuron.configure(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
+    Neuron.configure(neuron, exo_self, UUID.uuid4(), sut, &:math.tanh/1, [], [])
     cycles = 3
 
     Cortex.configure(sut, exo_self, id, [sensor], [actuator], [neuron], cycles)

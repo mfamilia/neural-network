@@ -14,7 +14,7 @@ defmodule NN.V1.ActuatorTest do
   end
 
   test "receive signal", %{actuator: actuator} do
-    GenServer.cast actuator, {:forward, [1, 2]}
+    GenServer.cast(actuator, {:forward, [1, 2]})
 
     assert_receive {:"$gen_cast", {:act, [1, 2]}}
   end

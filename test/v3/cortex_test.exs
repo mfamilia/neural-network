@@ -111,7 +111,7 @@ defmodule NN.V3.CortexTest do
   end
 
   test "terminates neural elements", %{sut: sut, exo_self: exo_self} do
-    Process.flag :trap_exit, true
+    Process.flag(:trap_exit, true)
     id = :id
     {:ok, sensor} = Sensor.start_link(exo_self)
     scape = exo_self
@@ -119,7 +119,7 @@ defmodule NN.V3.CortexTest do
     {:ok, actuator1} = Actuator.start_link(exo_self)
     {:ok, actuator2} = Actuator.start_link(exo_self)
     {:ok, neuron} = Neuron.start_link(exo_self)
-    Neuron.configure(neuron, exo_self, UUID.uuid4, sut, &:math.tanh/1, [], [])
+    Neuron.configure(neuron, exo_self, UUID.uuid4(), sut, &:math.tanh/1, [], [])
 
     Cortex.configure(sut, exo_self, id, [sensor], [actuator1, actuator2], [neuron])
 

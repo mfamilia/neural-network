@@ -19,7 +19,7 @@ defmodule NN.Constructors.Phenotype do
     actuator_ids = cortex(cortex, :actuator_ids)
     neuron_ids = cortex(cortex, :neuron_ids)
     cortex_id = cortex(cortex, :id)
-    {:ok, exo_self} = ExoSelf.start_link
+    {:ok, exo_self} = ExoSelf.start_link()
 
     start_scapes(exo_self, store, sensors, actuators)
 
@@ -34,15 +34,16 @@ defmodule NN.Constructors.Phenotype do
     link_network_elements(neurons, store, cortex_pid, exo_self)
     link_network_elements(actuators, store, cortex_pid, exo_self)
 
-    {_sensors, neuron_pids, _actuators} = link_cortex(
-      exo_self,
-      cortex_pid,
-      cortex_id,
-      sensor_ids,
-      actuator_ids,
-      neuron_ids,
-      store
-    )
+    {_sensors, neuron_pids, _actuators} =
+      link_cortex(
+        exo_self,
+        cortex_pid,
+        cortex_id,
+        sensor_ids,
+        actuator_ids,
+        neuron_ids,
+        store
+      )
 
     ExoSelf.configure(exo_self, cortex_pid, neuron_pids, genotype)
 
@@ -63,7 +64,7 @@ defmodule NN.Constructors.Phenotype do
 
   defp start_scapes(exo_self, store, sensors, actuators) do
     unique_scape_types(sensors, actuators)
-    |> Enum.each(fn({:private, type}) ->
+    |> Enum.each(fn {:private, type} ->
       {:ok, scape} = Scape.start_link(exo_self, type)
       :ets.insert(store, {type, scape})
       :ets.insert(store, {scape, type})
@@ -71,22 +72,23 @@ defmodule NN.Constructors.Phenotype do
   end
 
   defp unique_scape_types(sensors, actuators) do
-    sensor_scape_types = sensors
-    |> Enum.map(fn(s) ->
-      sensor(s, :scape)
-    end)
+    sensor_scape_types =
+      sensors
+      |> Enum.map(fn s ->
+        sensor(s, :scape)
+      end)
 
-    actuator_scape_types = actuators
-    |> Enum.map(fn(a) ->
-      actuator(a, :scape)
-    end)
+    actuator_scape_types =
+      actuators
+      |> Enum.map(fn a ->
+        actuator(a, :scape)
+      end)
 
     Enum.uniq(sensor_scape_types ++ actuator_scape_types)
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :sensor) do
-
+       when is_record(r, :sensor) do
     id = sensor(r, :id)
     pid = convert_id_to_pid(id, store)
     type = sensor(r, :type)
@@ -95,7 +97,8 @@ defmodule NN.Constructors.Phenotype do
     {:private, scape_type} = sensor(r, :scape)
     scape = convert_id_to_pid(scape_type, store)
 
-    Sensor.configure(pid,
+    Sensor.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -109,8 +112,7 @@ defmodule NN.Constructors.Phenotype do
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :actuator) do
-
+       when is_record(r, :actuator) do
     id = actuator(r, :id)
     pid = convert_id_to_pid(id, store)
     type = actuator(r, :type)
@@ -118,7 +120,8 @@ defmodule NN.Constructors.Phenotype do
     {:private, scape_type} = actuator(r, :scape)
     scape = convert_id_to_pid(scape_type, store)
 
-    Actuator.configure(pid,
+    Actuator.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -131,15 +134,15 @@ defmodule NN.Constructors.Phenotype do
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :neuron) do
-
+       when is_record(r, :neuron) do
     id = neuron(r, :id)
     pid = convert_id_to_pid(id, store)
     af = neuron(r, :activation_function)
     inputs = convert_input_ids_to_pids(neuron(r, :input_weights), store)
     outputs = convert_ids_to_pids(neuron(r, :output_ids), store)
 
-    Neuron.configure(pid,
+    Neuron.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -181,7 +184,7 @@ defmodule NN.Constructors.Phenotype do
   end
 
   defp convert_ids_to_pids(ids, store) do
-    Enum.map(ids, fn(id) ->
+    Enum.map(ids, fn id ->
       convert_id_to_pid(id, store)
     end)
   end

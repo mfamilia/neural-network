@@ -4,9 +4,9 @@ defmodule NN.V1.Cortex do
 
   defmodule State do
     defstruct sensor: nil,
-      neuron: nil,
-      actuator: nil,
-      env: nil
+              neuron: nil,
+              actuator: nil,
+              env: nil
   end
 
   def start_link(env) do
@@ -30,10 +30,10 @@ defmodule NN.V1.Cortex do
   end
 
   def terminate(_reason, %{neuron: n, sensor: s, actuator: a}) do
-   [n, s, a]
-     |> Enum.each(fn(x) ->
-       GenServer.stop(x)
-     end)
+    [n, s, a]
+    |> Enum.each(fn x ->
+      GenServer.stop(x)
+    end)
   end
 
   def handle_cast({:actuator, _actuator, :sync}, state) do

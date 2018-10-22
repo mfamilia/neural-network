@@ -19,7 +19,7 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     input_weights = [{exo_self, weights}]
     outputs = [exo_self]
 
@@ -31,7 +31,7 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0.032 , 0.453]
+    weights = [0.032, 0.453]
     input_weights = [{exo_self, weights, :test}]
     outputs = [exo_self]
 
@@ -48,13 +48,13 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     input_weights = [{exo_self, weights, :test}]
     outputs = [exo_self]
 
     Neuron.configure(sut, exo_self, id, cortex, activation_function, input_weights, outputs)
 
-    with_mock Random, [uniform: fn -> 0 end] do
+    with_mock Random, uniform: fn -> 0 end do
       Neuron.perturb(sut, cortex)
 
       refute Neuron.input_weights(sut, cortex) == {sut, :id, input_weights}
@@ -65,7 +65,7 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     inputs = [{exo_self, weights, :test}]
     outputs = [exo_self]
 
@@ -81,7 +81,7 @@ defmodule NN.V3.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     inputs = [{exo_self, weights, :test} | [1]]
     outputs = [exo_self]
 

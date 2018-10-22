@@ -7,10 +7,11 @@ defmodule NN.Constructors.PhenotypeTest do
     morphology = :xor
     hidden_layer_densities = [2]
 
-    {:ok, genotype} = Genotype.construct(
-      morphology,
-      hidden_layer_densities
-    )
+    {:ok, genotype} =
+      Genotype.construct(
+        morphology,
+        hidden_layer_densities
+      )
 
     [genotype: genotype]
   end

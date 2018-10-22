@@ -28,8 +28,7 @@ defmodule NN.V1.Neuron do
   end
 
   def handle_cast({:forward, input}, {target, weights} = state)
-    when is_list(input) and (length(input) == 2) do
-
+      when is_list(input) and length(input) == 2 do
     dot_product = dot(input, weights, 0)
     output = [:math.tanh(dot_product)]
     GenServer.cast(target, {:forward, output})
@@ -38,11 +37,11 @@ defmodule NN.V1.Neuron do
   end
 
   defp random do
-    Random.uniform-0.5
+    Random.uniform() - 0.5
   end
 
-  defp dot([i|input], [w|weights], acc) do
-    dot(input, weights, i*w + acc)
+  defp dot([i | input], [w | weights], acc) do
+    dot(input, weights, i * w + acc)
   end
 
   defp dot([], [bias], acc) do

@@ -6,6 +6,6 @@ defmodule Random do
   end
 
   def uniform do
-    :rand.uniform
+    :rand.uniform()
   end
 end

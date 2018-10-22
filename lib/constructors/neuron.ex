@@ -7,8 +7,9 @@ defmodule NN.Constructors.Neuron do
     total_layers = length(layer_densities)
     [first_layer_density | next_layer_densities] = layer_densities
 
-    neuron_ids = generate_ids(first_layer_density, [])
-      |> Enum.map(fn(id) -> {:neuron, {1, id}} end)
+    neuron_ids =
+      generate_ids(first_layer_density, [])
+      |> Enum.map(fn id -> {:neuron, {1, id}} end)
 
     state = %{
       cortex_id: cortex_id,
@@ -55,24 +56,24 @@ defmodule NN.Constructors.Neuron do
     } = state
 
     ids = generate_ids(layer_density, [])
-    output_neuron_ids = Enum.map(ids, fn(id) -> {:neuron, {layer_index+1, id}} end)
+    output_neuron_ids = Enum.map(ids, fn id -> {:neuron, {layer_index + 1, id}} end)
     layer_neurons = create_neuro_layer(cortex_id, input_idps, neuron_ids, output_neuron_ids, [])
-    next_input_idps = Enum.map(neuron_ids, fn(id) -> {id, 1} end)
+    next_input_idps = Enum.map(neuron_ids, fn id -> {id, 1} end)
 
     create_neuro_layers(%{
-      state |
-      layer_index: layer_index + 1,
-      input_idps: next_input_idps,
-      neuron_ids: output_neuron_ids,
-      layer_densities: next_layer_densities,
-      neurons: [layer_neurons | neurons],
-      input_layer: input_layer || layer_neurons
+      state
+      | layer_index: layer_index + 1,
+        input_idps: next_input_idps,
+        neuron_ids: output_neuron_ids,
+        layer_densities: next_layer_densities,
+        neurons: [layer_neurons | neurons],
+        input_layer: input_layer || layer_neurons
     })
   end
 
   def create_neuro_layer(cortex_id, input_idps, [id | neuron_ids], output_ids, acc) do
     neuron = create_neuron(input_idps, id, cortex_id, output_ids)
-    create_neuro_layer(cortex_id, input_idps, neuron_ids, output_ids, [neuron|acc])
+    create_neuro_layer(cortex_id, input_idps, neuron_ids, output_ids, [neuron | acc])
   end
 
   def create_neuro_layer(_cortex_id, _input_ids, [], _output_ids, acc) do
@@ -82,20 +83,22 @@ defmodule NN.Constructors.Neuron do
   def create_neuron(input_idps, id, cortex_id, output_ids) do
     input_weights = create_neural_input(input_idps, [])
 
-    neuron(id: id,
+    neuron(
+      id: id,
       cortex_id: cortex_id,
       activation_function: :tanh,
       input_weights: input_weights,
-      output_ids: output_ids)
+      output_ids: output_ids
+    )
   end
 
   def create_neural_input([{input_id, input_vector_length} | input_idps], acc) do
-    weights =  create_neural_weights(input_vector_length, [])
+    weights = create_neural_weights(input_vector_length, [])
     create_neural_input(input_idps, [{input_id, weights} | acc])
   end
 
   def create_neural_input([], acc) do
-    Enum.reverse([{:bias, Random.uniform - 0.5} | acc])
+    Enum.reverse([{:bias, Random.uniform() - 0.5} | acc])
   end
 
   def create_neural_weights(0, acc) do
@@ -103,7 +106,7 @@ defmodule NN.Constructors.Neuron do
   end
 
   def create_neural_weights(index, acc) do
-    w = Random.uniform - 0.5
+    w = Random.uniform() - 0.5
     create_neural_weights(index - 1, [w | acc])
   end
 end

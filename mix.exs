@@ -6,8 +6,8 @@ defmodule NN.Mixfile do
       app: :nn,
       version: "0.0.1",
       elixir: "~> 1.2",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       preferred_cli_env: [espec: :test]
     ]

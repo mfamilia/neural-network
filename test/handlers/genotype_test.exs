@@ -5,14 +5,14 @@ defmodule NN.Handlers.GenotypeTest do
   require Record
 
   setup do
-    io = %{puts: fn(msg) -> send(self(), {:puts, msg}) end}
+    io = %{puts: fn msg -> send(self(), {:puts, msg}) end}
 
     file_name = "./test/genotype.nn"
     File.rm(file_name)
 
-    on_exit fn ->
+    on_exit(fn ->
       File.rm(file_name)
-    end
+    end)
 
     [file_name: file_name, io: io]
   end
@@ -37,9 +37,10 @@ defmodule NN.Handlers.GenotypeTest do
     {:ok, sut} = Genotype.start_link(file_name, io)
 
     assert Genotype.load(sut) == :ok
-    assert {:ok, neurons}= Genotype.neurons(sut)
+    assert {:ok, neurons} = Genotype.neurons(sut)
     assert length(neurons) == 5
-    Enum.each(neurons, fn(n)->
+
+    Enum.each(neurons, fn n ->
       assert Record.is_record(n, :neuron)
     end)
   end
@@ -49,9 +50,10 @@ defmodule NN.Handlers.GenotypeTest do
     {:ok, sut} = Genotype.start_link(file_name, io)
 
     assert Genotype.load(sut) == :ok
-    assert {:ok, sensors}= Genotype.sensors(sut)
+    assert {:ok, sensors} = Genotype.sensors(sut)
     assert length(sensors) == 1
-    Enum.each(sensors, fn(s)->
+
+    Enum.each(sensors, fn s ->
       assert Record.is_record(s, :sensor)
     end)
   end
@@ -61,9 +63,10 @@ defmodule NN.Handlers.GenotypeTest do
     {:ok, sut} = Genotype.start_link(file_name, io)
 
     assert Genotype.load(sut) == :ok
-    assert {:ok, actuators}= Genotype.actuators(sut)
+    assert {:ok, actuators} = Genotype.actuators(sut)
     assert length(actuators) == 1
-    Enum.each(actuators, fn(a)->
+
+    Enum.each(actuators, fn a ->
       assert Record.is_record(a, :actuator)
     end)
   end
@@ -138,14 +141,14 @@ defmodule NN.Handlers.GenotypeTest do
   test "print" do
     file_name = "./test/fixtures/genotypes/v2.nn"
     self = self()
-    io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
+    io = %{puts: fn msg -> send(self, {:puts, msg}) end}
     {:ok, sut} = Genotype.start_link(file_name, io)
 
     assert Genotype.load(sut) == :ok
 
     Genotype.print(sut)
 
-    Enum.each(1..8, fn(_) ->
+    Enum.each(1..8, fn _ ->
       assert_receive {:puts, _element}
     end)
 
@@ -155,7 +158,7 @@ defmodule NN.Handlers.GenotypeTest do
   test "rename" do
     file_name = "./test/fixtures/genotypes/v2.nn"
     self = self()
-    io = %{puts: fn(msg) -> send(self, {:puts, msg}) end}
+    io = %{puts: fn msg -> send(self, {:puts, msg}) end}
     {:ok, sut} = Genotype.start_link(file_name, io)
 
     assert Genotype.load(sut) == :ok

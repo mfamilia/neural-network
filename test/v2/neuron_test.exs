@@ -17,7 +17,7 @@ defmodule NN.V2.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
 
@@ -30,7 +30,7 @@ defmodule NN.V2.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     inputs = [{exo_self, weights}]
     outputs = [exo_self]
 
@@ -46,7 +46,7 @@ defmodule NN.V2.NeuronTest do
     id = :id
     cortex = exo_self
     activation_function = :tanh
-    weights = [0 , 1]
+    weights = [0, 1]
     inputs = [{exo_self, weights} | [1]]
     outputs = [exo_self]
 

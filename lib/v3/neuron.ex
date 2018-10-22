@@ -6,13 +6,13 @@ defmodule NN.V3.Neuron do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      activation_function: nil,
-      input_weights: nil,
-      outputs: nil,
-      memory_input_weights: nil,
-      accumulator: nil
+              id: nil,
+              cortex: nil,
+              activation_function: nil,
+              input_weights: nil,
+              outputs: nil,
+              memory_input_weights: nil,
+              accumulator: nil
   end
 
   def start_link(exo_self) do
@@ -74,7 +74,11 @@ defmodule NN.V3.Neuron do
     handle_cast({from, :forward, signal}, %{state | input_weights: [{from, weights, id} | [0]]})
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights, _id} | [bias]]} = state) when is_number(bias) do
+  def handle_cast(
+        {from, :forward, signal},
+        %{input_weights: [{from, weights, _id} | [bias]]} = state
+      )
+      when is_number(bias) do
     result = dot_product(signal, weights)
 
     %{
@@ -91,7 +95,10 @@ defmodule NN.V3.Neuron do
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights, _id} | input_weights]} = state) do
+  def handle_cast(
+        {from, :forward, signal},
+        %{input_weights: [{from, weights, _id} | input_weights]} = state
+      ) do
     %{accumulator: accumulator} = state
 
     result = dot_product(signal, weights)
@@ -118,10 +125,7 @@ defmodule NN.V3.Neuron do
   def handle_cast({exo_self, :restore}, %{exo_self: exo_self} = state) do
     input_weights = Process.get(:input_weights)
 
-    state = %{state |
-      input_weights: input_weights,
-      memory_input_weights: input_weights
-    }
+    state = %{state | input_weights: input_weights, memory_input_weights: input_weights}
 
     {:noreply, state}
   end
@@ -131,10 +135,7 @@ defmodule NN.V3.Neuron do
 
     input_weights = perturb_input_weights(i)
 
-    state = %{state |
-      input_weights: input_weights,
-      memory_input_weights: input_weights
-    }
+    state = %{state | input_weights: input_weights, memory_input_weights: input_weights}
 
     {:noreply, state}
   end
@@ -144,13 +145,14 @@ defmodule NN.V3.Neuron do
   end
 
   defp perturb_input_weights(input_weights) do
-    total_weights = Enum.filter(input_weights, fn(element) ->
-      match?({_pid, _weights, _id}, element)
-    end)
-    |> Enum.reduce(0, fn(x, acc) ->
-      {_pid, weights, _id} = x
-      acc + length(weights)
-    end)
+    total_weights =
+      Enum.filter(input_weights, fn element ->
+        match?({_pid, _weights, _id}, element)
+      end)
+      |> Enum.reduce(0, fn x, acc ->
+        {_pid, weights, _id} = x
+        acc + length(weights)
+      end)
 
     probability = 1 / :math.sqrt(total_weights)
 
@@ -164,14 +166,16 @@ defmodule NN.V3.Neuron do
   end
 
   defp perturb_input_weights(probability, [bias], acc) do
-    updated_bias = case Random.uniform < probability do
-      true ->
-        value = (Random.uniform - 0.5) * @delta_multiplier + bias
+    updated_bias =
+      case Random.uniform() < probability do
+        true ->
+          value = (Random.uniform() - 0.5) * @delta_multiplier + bias
 
-        saturate(value, - @saturation_limit, @saturation_limit)
-      false ->
-        bias
-    end
+          saturate(value, -@saturation_limit, @saturation_limit)
+
+        false ->
+          bias
+      end
 
     Enum.reverse([updated_bias | acc])
   end
@@ -181,14 +185,16 @@ defmodule NN.V3.Neuron do
   end
 
   defp perturb_weights(probability, [w | weights], acc) do
-    updated_weight = case Random.uniform < probability do
-      true ->
-        value = (Random.uniform - 0.5) * @delta_multiplier + w
+    updated_weight =
+      case Random.uniform() < probability do
+        true ->
+          value = (Random.uniform() - 0.5) * @delta_multiplier + w
 
-        saturate(value, - @saturation_limit, @saturation_limit)
-      false ->
-        w
-    end
+          saturate(value, -@saturation_limit, @saturation_limit)
+
+        false ->
+          w
+      end
 
     perturb_weights(probability, weights, [updated_weight | acc])
   end
@@ -201,8 +207,10 @@ defmodule NN.V3.Neuron do
     cond do
       value < min ->
         min
+
       value > max ->
         max
+
       true ->
         value
     end
@@ -212,7 +220,7 @@ defmodule NN.V3.Neuron do
     result = apply(__MODULE__, activation_function, [signal])
     from = self()
 
-    Enum.each(outputs, fn(x) ->
+    Enum.each(outputs, fn x ->
       forward(x, from, [result])
     end)
   end
@@ -222,7 +230,7 @@ defmodule NN.V3.Neuron do
   end
 
   defp dot_product([i | input], [w | weights], acc) do
-    dot_product(input, weights, i*w + acc)
+    dot_product(input, weights, i * w + acc)
   end
 
   defp dot_product([], [], acc) do

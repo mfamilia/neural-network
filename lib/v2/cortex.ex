@@ -4,12 +4,12 @@ defmodule NN.V2.Cortex do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      sensors: nil,
-      actuators: nil,
-      neurons: nil,
-      cycles: nil,
-      memory: nil
+              id: nil,
+              sensors: nil,
+              actuators: nil,
+              neurons: nil,
+              cycles: nil,
+              memory: nil
   end
 
   def start_link(exo_self) do
@@ -74,9 +74,9 @@ defmodule NN.V2.Cortex do
 
   def terminate(_reason, %{sensors: sensors, memory: actuators, neurons: neurons}) do
     [sensors, actuators, neurons]
-      |> Enum.each(fn(x) ->
-        Enum.each(x, &GenServer.stop/1)
-      end)
+    |> Enum.each(fn x ->
+      Enum.each(x, &GenServer.stop/1)
+    end)
   end
 
   defp send_backup(%{exo_self: exo_self} = state) do
@@ -88,15 +88,15 @@ defmodule NN.V2.Cortex do
     cortex = self()
 
     neurons
-      |> Enum.map(fn(n) ->
-        {^n, id, weights} = Neuron.backup(n, cortex)
+    |> Enum.map(fn n ->
+      {^n, id, weights} = Neuron.backup(n, cortex)
 
-        {id, weights}
-      end)
+      {id, weights}
+    end)
   end
 
   defp trigger_sensors(sensors) do
-    Enum.each(sensors, fn(s) ->
+    Enum.each(sensors, fn s ->
       Sensor.sync(s, self())
     end)
   end

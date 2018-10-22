@@ -4,13 +4,13 @@ defmodule NN.V3.Actuator do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      actuator_type: nil,
-      neurons: nil,
-      memory: nil,
-      signals: nil,
-      scape: nil
+              id: nil,
+              cortex: nil,
+              actuator_type: nil,
+              neurons: nil,
+              memory: nil,
+              signals: nil,
+              scape: nil
   end
 
   def start_link(exo_self) do
@@ -31,15 +31,19 @@ defmodule NN.V3.Actuator do
     GenServer.cast(pid, {from, :forward, signal})
   end
 
-  def handle_cast({exo_self, {id, cortex, scape, actuator_type, neurons}}, %{exo_self: exo_self} = state) do
-    state = %{state |
-      id: id,
-      cortex: cortex,
-      actuator_type: actuator_type,
-      neurons: neurons,
-      memory: neurons,
-      signals: [],
-      scape: scape
+  def handle_cast(
+        {exo_self, {id, cortex, scape, actuator_type, neurons}},
+        %{exo_self: exo_self} = state
+      ) do
+    state = %{
+      state
+      | id: id,
+        cortex: cortex,
+        actuator_type: actuator_type,
+        neurons: neurons,
+        memory: neurons,
+        signals: [],
+        scape: scape
     }
 
     {:noreply, state}
@@ -64,7 +68,10 @@ defmodule NN.V3.Actuator do
     {:noreply, state}
   end
 
-  def handle_cast({neuron, :forward, signal}, %{neurons: [neuron | neurons], signals: signals} = state) do
+  def handle_cast(
+        {neuron, :forward, signal},
+        %{neurons: [neuron | neurons], signals: signals} = state
+      ) do
     state = %{state | neurons: neurons, signals: signal ++ signals}
 
     {:noreply, state}

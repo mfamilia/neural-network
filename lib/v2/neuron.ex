@@ -3,13 +3,13 @@ defmodule NN.V2.Neuron do
 
   defmodule State do
     defstruct exo_self: nil,
-      id: nil,
-      cortex: nil,
-      activation_function: nil,
-      input_weights: nil,
-      outputs: nil,
-      memory: nil,
-      accumulator: nil
+              id: nil,
+              cortex: nil,
+              activation_function: nil,
+              input_weights: nil,
+              outputs: nil,
+              memory: nil,
+              accumulator: nil
   end
 
   def start_link(exo_self) do
@@ -57,7 +57,8 @@ defmodule NN.V2.Neuron do
     handle_cast({from, :forward, signal}, %{state | input_weights: [{from, weights} | [0]]})
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | [bias]]} = state) when is_number(bias) do
+  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | [bias]]} = state)
+      when is_number(bias) do
     result = dot_product(signal, weights)
 
     %{
@@ -74,7 +75,10 @@ defmodule NN.V2.Neuron do
     {:noreply, state}
   end
 
-  def handle_cast({from, :forward, signal}, %{input_weights: [{from, weights} | input_weights]} = state) do
+  def handle_cast(
+        {from, :forward, signal},
+        %{input_weights: [{from, weights} | input_weights]} = state
+      ) do
     %{accumulator: accumulator} = state
 
     result = dot_product(signal, weights)
@@ -98,7 +102,7 @@ defmodule NN.V2.Neuron do
     result = apply(__MODULE__, activation_function, [signal])
     from = self()
 
-    Enum.each(outputs, fn(x) ->
+    Enum.each(outputs, fn x ->
       forward(x, from, [result])
     end)
   end
@@ -108,7 +112,7 @@ defmodule NN.V2.Neuron do
   end
 
   defp dot_product([i | input], [w | weights], acc) do
-    dot_product(input, weights, i*w + acc)
+    dot_product(input, weights, i * w + acc)
   end
 
   defp dot_product([], [], acc) do

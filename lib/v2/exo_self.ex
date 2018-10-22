@@ -8,8 +8,8 @@ defmodule NN.V2.ExoSelf do
 
   defmodule State do
     defstruct store: nil,
-      cortex: nil,
-      handler: nil
+              cortex: nil,
+              handler: nil
   end
 
   def start_link(handler) do
@@ -125,15 +125,15 @@ defmodule NN.V2.ExoSelf do
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :sensor) do
-
+       when is_record(r, :sensor) do
     id = sensor(r, :id)
     pid = convert_id_to_pid(id, store)
     type = sensor(r, :type)
     vl = sensor(r, :vector_length)
     neurons = convert_ids_to_pids(sensor(r, :neuron_ids), store)
 
-    Sensor.configure(pid,
+    Sensor.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -146,14 +146,14 @@ defmodule NN.V2.ExoSelf do
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :actuator) do
-
+       when is_record(r, :actuator) do
     id = actuator(r, :id)
     pid = convert_id_to_pid(id, store)
     type = actuator(r, :type)
     neurons = convert_ids_to_pids(actuator(r, :neuron_ids), store)
 
-    Actuator.configure(pid,
+    Actuator.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -165,15 +165,15 @@ defmodule NN.V2.ExoSelf do
   end
 
   defp link_network_elements([r | records], store, cortex, exo_self)
-    when is_record(r, :neuron) do
-
+       when is_record(r, :neuron) do
     id = neuron(r, :id)
     pid = convert_id_to_pid(id, store)
     af = neuron(r, :activation_function)
     inputs = convert_input_ids_to_pids(neuron(r, :input_weights), store)
     outputs = convert_ids_to_pids(neuron(r, :output_ids), store)
 
-    Neuron.configure(pid,
+    Neuron.configure(
+      pid,
       exo_self,
       id,
       cortex,
@@ -216,7 +216,7 @@ defmodule NN.V2.ExoSelf do
   end
 
   defp convert_ids_to_pids(ids, store) do
-    Enum.map(ids, fn(id) ->
+    Enum.map(ids, fn id ->
       convert_id_to_pid(id, store)
     end)
   end

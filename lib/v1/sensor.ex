@@ -3,7 +3,7 @@ defmodule NN.V1.Sensor do
 
   defmodule State do
     defstruct neuron: nil,
-      env: nil
+              env: nil
   end
 
   def start_link(neuron, env) do
@@ -19,9 +19,9 @@ defmodule NN.V1.Sensor do
   end
 
   def handle_cast(:sync, %{neuron: neuron, env: env} = state) do
-    input = GenServer.call env, :sense
+    input = GenServer.call(env, :sense)
 
-    GenServer.cast neuron, {:forward, input}
+    GenServer.cast(neuron, {:forward, input})
 
     {:noreply, state}
   end

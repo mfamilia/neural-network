@@ -7,7 +7,7 @@ defmodule NN.Morphologies.PrintTest do
   require Record
 
   test "sensors" do
-    [sensor] = Print.sensors
+    [sensor] = Print.sensors()
 
     assert Record.is_record(sensor, :sensor)
     assert {:sensor, _} = sensor(sensor, :id)
@@ -17,7 +17,7 @@ defmodule NN.Morphologies.PrintTest do
   end
 
   test "actuators" do
-    [actuator] = Print.actuators
+    [actuator] = Print.actuators()
 
     assert Record.is_record(actuator, :actuator)
     assert {:actuator, _} = actuator(actuator, :id)

@@ -7,7 +7,7 @@ defmodule NN.Morphologies.XorTest do
   require Record
 
   test "sensors" do
-    [sensor] = Xor.sensors
+    [sensor] = Xor.sensors()
 
     assert Record.is_record(sensor, :sensor)
     assert {:sensor, _} = sensor(sensor, :id)
@@ -17,7 +17,7 @@ defmodule NN.Morphologies.XorTest do
   end
 
   test "actuators" do
-    [actuator] = Xor.actuators
+    [actuator] = Xor.actuators()
 
     assert Record.is_record(actuator, :actuator)
     assert {:actuator, _} = actuator(actuator, :id)

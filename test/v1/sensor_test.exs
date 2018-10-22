@@ -18,7 +18,7 @@ defmodule NN.V1.SensorTest do
 
     assert_receive {:"$gen_call", from, :sense}
 
-    GenServer.reply from, [1, 2]
+    GenServer.reply(from, [1, 2])
 
     assert_receive {:"$gen_cast", {:forward, [1, 2]}}
   end

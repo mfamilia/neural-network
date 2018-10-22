@@ -26,7 +26,7 @@ defmodule NN.V3.SensorTest do
     Sensor.sync(sut, cortex)
 
     assert_receive {:"$gen_call", from, {^exo_self, :sense}}
-    GenServer.reply from, {:percept, [0, 1]}
+    GenServer.reply(from, {:percept, [0, 1]})
 
     assert_receive {:"$gen_cast", {^sut, :forward, [0, 1]}}
   end

@@ -1,5 +1,6 @@
 defmodule NN.Constructors.Genotype do
   import NN.NetworkElementTypes
+
   import NN.Constructors.{
     Ids,
     Neuron,
@@ -13,7 +14,7 @@ defmodule NN.Constructors.Genotype do
   def construct(morphology, hidden_layer_densities) do
     s = Morphology.sensor(morphology)
     a = Morphology.actuator(morphology)
-    {:ok, genotype} = Genotype.start_link
+    {:ok, genotype} = Genotype.start_link()
 
     Random.seed()
 
@@ -23,12 +24,13 @@ defmodule NN.Constructors.Genotype do
 
     {input_layer, neurons, output_layer} = create_neuro_layers(cortex_id, s, a, layer_densities)
 
-    first_layer_neuron_ids = Enum.map(input_layer, fn(n) -> neuron(n, :id) end)
-    last_layer_neuron_ids = Enum.map(output_layer, fn(n) -> neuron(n, :id) end)
+    first_layer_neuron_ids = Enum.map(input_layer, fn n -> neuron(n, :id) end)
+    last_layer_neuron_ids = Enum.map(output_layer, fn n -> neuron(n, :id) end)
 
-    neuron_ids = neurons
-      |> List.flatten
-      |> Enum.map(fn(n) ->
+    neuron_ids =
+      neurons
+      |> List.flatten()
+      |> Enum.map(fn n ->
         neuron(n, :id)
       end)
 
@@ -37,9 +39,9 @@ defmodule NN.Constructors.Genotype do
     cortex = create_cortex(cortex_id, [sensor(s, :id)], [actuator(a, :id)], neuron_ids)
 
     List.flatten([cortex, sensor, actuator | neurons])
-      |> Enum.each(fn(e) ->
-        Genotype.update(genotype, e)
-      end)
+    |> Enum.each(fn e ->
+      Genotype.update(genotype, e)
+    end)
 
     {:ok, genotype}
   end
